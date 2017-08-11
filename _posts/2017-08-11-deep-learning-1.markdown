@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Deep Learning Tutorials"
+title:  "Deep Learning Tutorials - Start here!"
 date:   2017-08-11 10:25:00 +0530
 categories: introduction deeplearning
 ---
