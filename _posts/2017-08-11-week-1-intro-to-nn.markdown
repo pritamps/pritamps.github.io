@@ -7,14 +7,16 @@ categories: deeplearning neuralnetworks
 
 Technically, [Deep Learning][deep-learning-wiki] is the application of Neural Networks where more than one hidden layer of neurons is involved. In the common form that it has pervaded the media today, it also usually involves a mixture of neural networks with other algorithms specifically applied to large datasets in a variety of areas. 
 
-This post corresponds roughly to Week 1 in the [Coursera Deep Learning Specialisation][deep-learning-coursera]. The idea cover just enough ground (in a very shallow way, pun sort-of intended) so that you can say the above paragraph out loud and understand what it means. So the following questions that I'm sure are burning your stomach will be answered:
+Don't know what that means? You're in the right place! The idea of this post cover just enough ground (in a very shallow way, pun sort-of intended) so that you can say the above paragraph out loud and understand what it means. So the following questions that I'm sure are burning your stomach will be answered:
 
 1. What is a neuron?
 2. What is a neural network?
 3. What is deep learning?
 4. Why has it taken off in the last decade or so?
 
-Let's get started!
+This post corresponds roughly to Week 1 in the [Coursera Deep Learning Specialisation][deep-learning-coursera]. 
+
+So, let's get started!
 
 ## What is a Neuron?
 
@@ -74,7 +76,7 @@ Neural networks are used everywhere these days: from product recommendations to 
 3. Recurrent Neural Networks: where we make use of sequential patterns in the data, like in natural language. So this is used in speech recognition, language processing, and those kinds of things
 4. Custom/Hybrid: where you have different techniques, you can mix-and-match. Custom NNs are used in complex applications such as self driving cars.
 
-<mark>Important thing</mark>: These days, all the publicity with deep learning is going to cool-sounding things like Image Processing ("Is that a bird? Is it a plane? No, it's Superman!"), speech recognition ("The rain in spain falls mainly in the plain"), and their ilk. The commonality between these problems is that the data that the algorithms use are **unstructured**. The reason they are so popular is that our brain also seems to think in an unstructured form (I know mine does!) and so maybe we can related better to these problems.
+<mark>Important thing</mark>: These days, all the publicity with deep learning is going to cool-sounding things like Image Processing ("Is that a bird? Is it a plane? No, it's Superman!"), speech recognition ("The rain in spain falls mainly in the plain"), and their ilk. The commonality between these problems is that the data that the algorithms use are **unstructured**. The reason they are so popular is that our brain also seems to think in an unstructured form (I know mine does!) and so maybe we can relate better to these problems.
 
 However, great economic value has been obtained by applying NNs to **structured** data as well. One of the areas that has received the greatest bump in awesomeness because of Deep Learning, for example, is Ad Pricing. You know how when you search for an product on Google, suddenly Facebook is showing you ads for the product. Well, someone is choosing to bid to show that ad to you at that moment, and they're basing their decision on many computers running many iterations of Neural Networks on all the data they have on you!
 
