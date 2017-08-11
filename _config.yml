@@ -16,7 +16,7 @@
 title: Programming Blog
 email: pritamps@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  My space on internet to write about programming related things
+  My space on the internet to write about Computer Science (and Aerospace?) related things
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: pritamps
@@ -27,6 +27,9 @@ markdown: kramdown
 theme: minima
 plugins:
   - jekyll-feed
+
+sass:
+  sass_dir: _sass
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
