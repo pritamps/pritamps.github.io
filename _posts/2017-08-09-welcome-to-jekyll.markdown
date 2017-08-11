@@ -1,25 +1,24 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
+title:  "Welcome to My Technical Blog!"
 date:   2017-08-09 09:55:42 +0530
-categories: jekyll update
+categories: introduction update
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it la la la and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
 
-To add new posts, simply add a file in the `_posts` directory that follows the convention `YYYY-MM-DD-name-of-post.ext` and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+Hi! I'm Pritam Sukumar, a freelance Software Engineer travelling around in India while working on pet projects and being a project reviewer for the Udacity Artificial Intelligence Nanodegree.
 
-Jekyll also offers powerful support for code snippets:
+I've been programming since I was a kid, starting with learning C by myself (anyone use *Let us C* by Yashwant Kanetkar? One of the clearest books I've ever read) when I was 14, moving onto C++, then taking a diversion into MATLAB for my graduate work in Aerospace Engineering, and then jumping into Java and Android.
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
+I want to use this space to keep notes on what I'm learning, and also maybe write tutorials once in a while if I can find the enthusiasm and put in the time. Right now, I'm learning:
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+1. Deep Learning from Andrew Ng's [Deep Learning ][deep-learning] course on Coursera
+2. iOS from the [Stanford CS193p course][cs193p] on iTunes
 
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+So hopefully you'll see tutorials on all those things. Good luck!
+
+Cheers,
+Pritam
+
+[deep-learning]: https://www.coursera.org/specializations/deep-learning
+[cs193p]: https://itunes.apple.com/us/course/developing-ios-10-apps-with-swift/id1198467120
+
