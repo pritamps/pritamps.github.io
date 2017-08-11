@@ -26,7 +26,7 @@ In the Computer Science world, it's the same, really. A neuron takes an input, a
 
 "Wait, isn't that the same as a mathematical function?", one of you asks.
 
-Well, it is. But the idea is that you can use a certain class of functions, stack these neurons together, make layers and networks and stuff and suddenly you're able to do things that you never though possible. We'll get there. 
+Well, it is. But the idea is that you can use a certain class of functions, stack these neurons together, make layers and networks and stuff and suddenly you're able to do things that you never thought possible. We'll get there. 
 
 Here is a carefully constructed illutration that shows the in-depth workings of a single neuron as it is commonly represented in Computer Science.
 
@@ -35,9 +35,9 @@ Here is a carefully constructed illutration that shows the in-depth workings of 
 
 "Okay fine. What is the class of function that you use?", someone pipes in from the back.
 
-When neural networks were first being used, the [sigmoid][sigmoid] function was pretty popular. The idea of a sigmoid function is to kinda-sorta simulate the behaviour of a switch (Y = 0 when X is negative and Y = 1 when X is positive), but with the property that is continuous and differentiable everywhere.
+When neural networks were first being designed and used, the [sigmoid][sigmoid] function was pretty popular. The idea of a sigmoid function is to kinda-sorta simulate the behaviour of a switch (Y = 0 when X is negative and Y = 1 when X is positive), but with the property that is continuous and differentiable everywhere.
 
-These days however, the RELU (REctified Linear Unit) is much more popular (shown in the ugly figure below). Apparently, it works much better with optimization algorithms such as Gradient Descent 🤷‍, even though there is that obvious discontinuity in the derivative at X=0. Go figure. Maybe we'll figure this out some day in the future, you and me.
+These days however, the RELU (REctified Linear Unit) is much more popular (shown in the ugly figure below). Apparently, it works much better with optimization algorithms such as Gradient Descent 🤷‍, even though there is that obvious discontinuity in the derivative. Maybe we'll figure out how this works some day in the future, you and me.
 
 ![REctified Linear Unit]({{ site.url }}/assets/dl_week1/relu.jpg)
 *They could have just called it the RLU instead of RELU. Why the silly acronym?*
@@ -46,35 +46,39 @@ So, to summarise, neuron takes input X, applies the RELU function to it, and gen
 
 ## Neural Networks
 
-I'm sure many of you saw this coming, but guess what neural networks are? They're neurons stacked together!
+I'm sure many of you saw this coming, but guess what neural networks are? They're networks of neurons!
 
-They can be stacked together in a variety of ways, some of which are mind-bogglingly complex, but thankfully we don't have to think about that now. Right now, imagine them stacked in layers, each layer feeding into the one ahead of it. Here's a figure for ya.
+Neurons can be stacked together in a variety of ways, some of which are mind-bogglingly complex, but thankfully we don't have to think about that yet. Right now, imagine them stacked in layers, each layer feeding into the one ahead of it. Here's a figure for ya if my words aren't that well chosen.
 
 ![A feedforward neural network]({{ site.url }}/assets/dl_week1/nn_with_layers.jpg)
 *A feedforward neural network. Note that the figure is incomplete. Each neuron can link to ALL neurons in the next layer*
 
-So here's what happens when you have X: each neuron in each layer gets a weight. X is fed into the first layer and the RELU is applied by each neuron, the output of that neuron is multiplied by that weight and fed to the next layer. This is repeated till suddenly, you have your output value Y. 
+So here's what happens when you have X: 
+
+1. Each neuron in each layer has a weight. X is fed into the first layer and the RELU is applied by each neuron in the layer. 
+2. The output of that neuron is multiplied by that weight and fed to the next layer. 
+3. This is repeated till suddenly, you have your output value Y. 
 
 I know at least some of you are looking at that figure and thinking: How do you know how many layers to use? What do the layers mean? How do we decide the individual functions? Wait, what's happening?
 
-So, here's what we decide:
+So, here's what *we* decide:
 
 1. The number of layers between the input and output 
 2. The number of neurons in each layer
-3. The function that each neuron applies. By "decide" here, I mean that each neuron is an RELU. You don't get to choose!
+3. The function that each neuron applies. By "decide" here, I mean that each neuron is an RELU. You don't get to choose that for the most part!
 
 <mark>A cool thing</mark>: The algorithm figures out everything else! Everything else, of course, involves the weights on the individual neuron. The middle layers are sometimes called "hidden", because all you care about are X and Y, and the algorithm figures out everything in between
 
-<mark>Another cool thing</mark>: Does that figure look like your brain? I know it doesn't look like mine. It took a genius to make this connection, Walter Pitts. He spent most of his time chasing this idea of modeling the brain based on neurons and unfortunately is not alive today to see the results of his work. You can read an excellent article about him and his amazing and sad life [here][walter-pitts]
+<mark>Another cool thing</mark>: Does that figure look like your brain? I know it doesn't look like mine. It took a genius to make this connection: Walter Pitts. He spent most of his time chasing this idea of modeling the brain based on neural networks and unfortunately is not alive today to see the results of his work. You can read an excellent article about him and his amazing and sad life [here][walter-pitts]
 
 ### Applications and Types of Neural Networks
 
 Neural networks are used everywhere these days: from product recommendations to user-click probabilities, from image recognition to self driving cars. There are different types of neural networks, each of which we will get to at different points during this tutorial series:
 
-1. Standard Neural Nets: like the ones shown in that awesomely drawn figure above
-2. Convolutional Neural Nets: each layer becomes multi-dimensional. Not sure what that means? To be honest, neither am I. We'll figure it out in a future post. CNNs are all the rage in image processing these days.
-3. Recurrent Neural Networks: where we make use of sequential patterns in the data, like in natural language. So this is used in speech recognition, language processing, and those kinds of things
-4. Custom/Hybrid: where you have different techniques, you can mix-and-match. Custom NNs are used in complex applications such as self driving cars.
+1. Standard Neural Nets: Like the ones shown in that awesomely drawn figure above
+2. Convolutional Neural Nets: Each layer becomes multi-dimensional. Not sure what that means? To be honest, neither am I. We'll figure it out in a future post. For now, know that CNNs are all the rage in image processing these days
+3. Recurrent Neural Networks: wWere we make use of sequential patterns in the data, like in natural language. So this is used in speech recognition, language processing, and those kinds of things
+4. Custom/Hybrid: Where you have different techniques, you can mix-and-match. Custom NNs are used in complex applications such as self driving cars.
 
 <mark>Important thing</mark>: These days, all the publicity with deep learning is going to cool-sounding things like Image Processing ("Is that a bird? Is it a plane? No, it's Superman!"), speech recognition ("The rain in spain falls mainly in the plain"), and their ilk. The commonality between these problems is that the data that the algorithms use are **unstructured**. The reason they are so popular is that our brain also seems to think in an unstructured form (I know mine does!) and so maybe we can relate better to these problems.
 
