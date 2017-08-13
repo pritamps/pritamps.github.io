@@ -27,7 +27,7 @@ markdown: kramdown
 kramdown:
   math_engine: mathjax
 
-theme: minima
+theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
 
