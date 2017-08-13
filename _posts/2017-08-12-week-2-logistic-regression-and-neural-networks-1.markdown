@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Logistic Regression and Neural Networks - Part 1: Setting Up the Problem"
-date:   2017-08-11 10:25:00 +0530
+date:   2017-08-12 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression
 latexscript: js/katex_render.js
 ---
