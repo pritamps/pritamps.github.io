@@ -13,4 +13,3 @@ Coming soon - an unnecessary introduction to Logistic Regression and Gradient De
 
 on it's own line.
 
-<b> Just seeing if this works eh? </b>

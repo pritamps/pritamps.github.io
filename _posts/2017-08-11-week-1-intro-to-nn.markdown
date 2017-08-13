@@ -3,6 +3,7 @@ layout: post
 title:  "Introduction to Deep Learning"
 date:   2017-08-11 10:25:00 +0530
 categories: deeplearning neuralnetworks
+latexscript: js/katex_render.js
 ---
 
 Technically, [Deep Learning][deep-learning-wiki] is the application of Neural Networks where more than one hidden layer of neurons is involved. In the common form that it has pervaded the media today, it also usually involves a mixture of neural networks with other algorithms specifically applied to large datasets in a variety of areas. 
@@ -28,8 +29,8 @@ In the Computer Science world, it's the same, really. A neuron takes an input, a
 
 Nope, nope. A neuron actually does two things to achieve its transformation:
 
-1. Applies a **linear** function to the input
-2. Applies an activation function to it
+1. It applies a dot product to the inputs with the weights (the weights are a property of the neuron) and adds a threshold. For example, if the input vectors are of type <script type="math/tex"> \vec{x} \in \mathbb{R}_{3 \times 1}  </script>, the weights will be of the form <script type="math/tex"> \vec{w} \in \mathbb{R}_{3 \times 1} </script>, and the output of this step will be <script type="math/tex"> \vec{x} . \vec{w} + b </script>
+2. Applies an activation function to the result of 1 above, i.e <script type="math/tex"> f(\vec{x}.\vec{w} + b) </script> where <script type="math/tex"> f </script> is a function chosen by us.
 
 Here is a carefully constructed illutration that shows the in-depth workings of a single neuron as it is commonly represented in Computer Science.
 
@@ -60,9 +61,11 @@ Neurons can be stacked together in a variety of ways, some of which are mind-bog
 
 So here's what happens when you have X: 
 
-1. Each neuron in each layer has a weight. X is fed into the first layer and the RELU is applied by each neuron in the layer. 
-2. The output of that neuron is multiplied by that weight and fed to the next layer. 
+1. Each neuron in each layer has a set of weights. X is fed into the first layer. Each individual neuron outputs the thresholded dot product, to which RELU is applied.
+2. The output of all those neurons are fed to the next layer. 
 3. This is repeated till suddenly, you have your output value Y. 
+
+There's some handwaving here. I'll update this post with more clearly chosen words over the next few weeks. 
 
 I know at least some of you are looking at that figure and thinking: How do you know how many layers to use? What do the layers mean? How do we decide the individual functions? Wait, what's happening?
 
