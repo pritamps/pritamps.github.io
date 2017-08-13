@@ -59,13 +59,13 @@ Neurons can be stacked together in a variety of ways, some of which are mind-bog
 ![A feedforward neural network]({{ site.url }}/assets/dl_week1/nn_with_layers.jpg)
 *A feedforward neural network. Note that the figure is incomplete. Each neuron can link to ALL neurons in the next layer*
 
-So here's what happens when you have X: 
+So here's what happens when you have the input vector: 
 
 1. Each neuron in each layer has a set of weights. X is fed into the first layer. Each individual neuron outputs the thresholded dot product, to which RELU is applied.
 2. The output of all those neurons are fed to the next layer. 
 3. This is repeated till suddenly, you have your output value Y. 
 
-There's some handwaving here. I'll update this post with more clearly chosen words over the next few weeks. 
+There's some handwaving there, I admit, because this stuff is still simmering in the pot of understanding of my mind. I'll update this post with more clearly chosen words over the next few weeks. 
 
 I know at least some of you are looking at that figure and thinking: How do you know how many layers to use? What do the layers mean? How do we decide the individual functions? Wait, what's happening?
 

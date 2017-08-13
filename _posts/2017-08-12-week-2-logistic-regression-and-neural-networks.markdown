@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Logistic Regression and Neural Networks"
+title:  "Logistic Regression, Gradient Descent and Neural Networks"
 date:   2017-08-11 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression
 latexscript: js/katex_render.js
@@ -13,3 +13,4 @@ Coming soon - an unnecessary introduction to Logistic Regression and Gradient De
 
 on it's own line.
 
+[deep-learning-coursera]: https://www.coursera.org/specializations/deep-learning
