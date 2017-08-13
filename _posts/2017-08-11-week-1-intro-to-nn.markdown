@@ -26,16 +26,21 @@ In the Computer Science world, it's the same, really. A neuron takes an input, a
 
 "Wait, isn't that the same as a mathematical function?", one of you asks.
 
-Well, it is. But the idea is that you can use a certain class of functions, stack these neurons together, make layers and networks and stuff and suddenly you're able to do things that you never thought possible. We'll get there. 
+Nope, nope. A neuron actually does two things to achieve its transformation:
+
+1. Applies a **linear** function to the input
+2. Applies an activation function to it
 
 Here is a carefully constructed illutration that shows the in-depth workings of a single neuron as it is commonly represented in Computer Science.
 
 ![A not-so-helpful illustration of a neuron]({{ site.url }}/assets/dl_week1/nn_basic.jpg)
 *This illustration doesn't illustrate much other than my inexperience with drawing software*
 
-"Okay fine. What is the class of function that you use?", someone pipes in from the back.
+"Okay fine. The function that the neuron applies can be any linear function, right? What is the class of activation function that you can use?", someone pipes in from the back.
 
-When neural networks were first being designed and used, the [sigmoid][sigmoid] function was pretty popular. The idea of a sigmoid function is to kinda-sorta simulate the behaviour of a switch (Y = 0 when X is negative and Y = 1 when X is positive), but with the property that is continuous and differentiable everywhere.
+That's actually a very good question, thank you!
+
+When neural networks were first being designed and used, the [sigmoid][sigmoid] function was pretty popular. The idea of a sigmoid function is to kinda-sorta simulate the behaviour of a switch (Y = 0 when X is negative and Y = 1 when X is positive), but with the property that is continuous and differentiable everywhere. So if the output of our linear function is positive, you get a value close to 1, and if it's negative, you get a value of 0. Can you see how that will be useful if you are doing a classification problem where you either have to say "Yes" (1) or "No" (0)?
 
 These days however, the RELU (REctified Linear Unit) is much more popular (shown in the ugly figure below). Apparently, it works much better with optimization algorithms such as Gradient Descent 🤷‍, even though there is that obvious discontinuity in the derivative. Maybe we'll figure out how this works some day in the future, you and me.
 

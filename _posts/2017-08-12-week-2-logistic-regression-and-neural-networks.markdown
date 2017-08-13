@@ -12,3 +12,5 @@ Coming soon - an unnecessary introduction to Logistic Regression and Gradient De
 <script type="math/tex; mode=display"> \alpha = 2 </script>
 
 on it's own line.
+
+<b> Just seeing if this works eh? </b>
