@@ -27,5 +27,5 @@ This tutorial series is serving multiple purposes:
 I intend to use this post as a landing page for the tutorial series. I'll link to the individual posts from here.
 
 [deep-learning]: https://www.coursera.org/specializations/deep-learning
-[week-1]: {{ site.baseurl }}{% post_url /_posts/2017-08-11-week-1-intro-to-nn %}
-[week-2-part-1]: {{ site.baseurl }}{% post_url /_posts/2017-08-12-week-2-logistic-regression-and-neural-networks %}
+[week-1]: {{ site.baseurl }}{% post_url 2017-08-11-week-1-intro-to-nn %}
+[week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
