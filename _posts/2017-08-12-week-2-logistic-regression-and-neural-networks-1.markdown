@@ -14,13 +14,13 @@ In the first part, I'll introduce the notation (always a pain) and Logistic Regr
 
 Throughout this tutorial, we'll be using the <mark>cat-or-not problem</mark> to illustrate the mathematical and algorithmic points made. The problem: given an image, the network should be trained to be able to say if there is a cat in it or not; i.e. a simple binary classification problem. 
 
-## A brief introduction to Logistic Regression
+## A Brief Intro to Logistic Regression -- only one input, no learning yet!
 
 Logistic Regression is an algorithm that was developed for binary classification. Let's get with our cat problem to get comfortable with the ideas behind the algorithm, the notations used, and all that jazz. The parameters involved in Logistic Regression are:
 
 * What it takes in: 
-    - **Feature vectors**: The feature vector is represented as <script type="math/tex"> x \in \mathbb{R^{n_x}} </script>, where <script type="math/tex"> n_x </script> is the number of features. In code this would become an array of dimensions <script type="math/tex"> (n_x, 1) </script>
-    - **Training labels** The training label is represtend by <script type="math/tex"> y \in {0, 1} </script>. For example, in our cat-or-not game, <script type="math/tex"> y = 1 </script> would mean that a cat is in the image and <script type="math/tex"> y = 0 </script> would indicate that it is not
+    - **Feature vectors**: *One* feature vector is represented as <script type="math/tex"> x \in \mathbb{R^{n_x}} </script>, where <script type="math/tex"> n_x </script> is the number of features. In code, this would become an array of dimensions <script type="math/tex"> (n_x, 1) </script>.
+    - **Training labels**: *One* training label is represtend by <script type="math/tex"> y \in {0, 1} </script>. For example, in our cat-or-not game, <script type="math/tex"> y = 1 </script> would mean that a cat is in the image and <script type="math/tex"> y = 0 </script> would indicate that it is not
 * What it calculates:
     - **The weights and the threshold**: <script type="math/tex"> w \in \mathbb{R^{n_x}} </script> and <script type="math/tex"> b \in \mathbb{R} </script>. So <script type="math/tex"> w </script> is an array of dimensions <script type="math/tex"> (n_x, 1) </script> (same as <script type="math/tex"> x </script>), while <script type="math/tex"> b </script> is just a real number
 - What it predicts: <script type="math/tex"> \hat{y} = P( y = 1 | x)</script>, i.e. the probability that <script type="math/tex"> y </script> is 1 given <script type="math/tex"> x </script>. 
