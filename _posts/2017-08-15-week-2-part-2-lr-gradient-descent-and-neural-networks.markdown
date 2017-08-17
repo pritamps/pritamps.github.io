@@ -10,7 +10,7 @@ In the [previous post][previous-post], I introduced the basic idea behind logist
 
 1. **One input**: <script type="math/tex"> x \in \mathbb{R}^{n_x} </script>, a feature vector extracted from whatever our data source is, and <script type="math/tex"> n_x </script> is the number of features
 2. **One training label**: <script type="math/tex"> y \in {0,1}</script>
-3. **The weight and threshold**: <script type="math/tex">(w \in \mathbb{R}^{n_x}, b \in \mathbb{R})</script> are teh weight vector and the threshold respectively
+3. **The weight and threshold**: <script type="math/tex">(w \in \mathbb{R}^{n_x}, b \in \mathbb{R})</script> are the weight vector and the threshold respectively
 4. **The output**: <script type="math/tex"> \hat{y} = \sigma(w^Tx + b) </script> where <script type="math/tex"> \sigma </script> represents the sigmoid function, and <script type="math/tex"> \hat{y} </script> represents the *probability* that <script type="math/tex"> y </script> is 1. For example, in an object recognition problem, <script type="math/tex"> \hat{y} </script> would represent the probability that an object is in an image.
 
 If you need to refresh your memory, or for some reason, you're reading this before [Part 1][week-2-part-1], this would be a great time to click that link and have it open side-by-side with this one!
@@ -46,11 +46,63 @@ The shape of <script type="math/tex"> Y </script> is just <script type="math/tex
 
 Phew. That's a mouthful isn't it? But you and I, we're going to get used to this notation together. Now, onto the optimisation problem.
 
-## Optimisation
+## The Big Picture
 
-Coming soon!
+Let's take stock of what we have: we have <script type="math/tex"> n_x </script> examples, each of which is represented in a feature matrix <script type="math/tex"> X_{n_x \times m} </script>. The <script type="math/tex"> i^{th} </script> column in the matrix corresponds to the feature vector for the <script type="math/tex"> i^{th} </script> example.
+
+Our goal at the end of all this is to predict the label for new feature vector. The way we do this is by training our algorithm to *learn* based on all the information we have, i.e. the training examples. 
+
+Ideally, our algorithm would be perfect and learn everything perfectly. Of course, this is never the case because:
+
+1. All the information we need might not be in the training examples
+2. The way we collect information from the training examples might be incorrect or inefficient
+3. Have we forgotten this is the real world? Nothing is perfect here!
+
+In fact, it a rare thing to get perfect performance even on the training set!
+
+What does this mean for us? Well, it means we need a way to measure the imperfections, i.e. the quantity of errors we make on our training set while predicting on the training set, i.e. 
+<script type="math/tex; mode=display">
+J = \displaystyle\sum_{i=1}^{m} \mathbb{L}(y_i- \hat{y_i})
+</script>
+where <script type="math/tex"> y_i </script> and <script type="math/tex"> \hat{y_i} </script>   are the actual and the predicted label respectively. The function <script type="math/tex"> \mathbb{L} = \mathbb{L}: \mathbb{R} \rightarrow \mathbb{R} </script> is called the **Loss Function**. 
+
+The total error <script type="math/tex"> J </script> is just the sum of the loss function over all the training examples. This total error is called the **Cost Function**. 
+
+### The Loss Function and The Cost Function
+
+How do we choose the loss function. Here, I'll go over this *very* briefly. First of all, from the equation, you should see that the error is positive when there are more error. With that in mind, here are some ideas:
+
+1. Set <script type="math/tex"> \mathbb{} </script> to 0 if the prediction is correct and 1 if it is wrong.
+2. Define <script type="math/tex"> \mathbb{L} </script> as the sum of the squared errors: 
+<script type="math/tex; mode=display">
+\mathbb{L}(y, \hat{y}) = \frac{1}{2} (y - \hat{y})^2
+</script>
+3. <mark>Our Choice for Neural Networks</mark>: Define <script type="math/tex"> f </script> as this weird looking function called the Cross Entropy Loss: 
+<script type="math/tex; mode=display">
+\mathbb{L}(y, \hat{y}) =  -( y \log\hat{y} + (1-y) \log(1 - \hat{y} )
+</script>
+The negative sign above is because the part inside the parantheses decreases with increasing <script type="math/tex"> \hat{y} </script>, and we want it to increase. In the lectures in the coursera deep learning course, I recall Andrew Ng saying this is the logistic loss. That is incorrect. The logistic loss is an even more complex function, which we don't use anyway, so I'm omitting it. 
+
+In general, a good loss function is continuous, differentiable, *always positive*, deals with outliers (large deviations and errors), and works well with optimisation algorithms. For our case of Neural Networks, many engineers and scientists before us have chosen the third function above as the best option. So we do, too. It turns out this function works espcially works well with our optimisation algorithm of choice: Stochastic Gradient Descent (woo. Big words!)
+
+So, there we have it: our complicated loss function. Using it, our cost function <script type="math/tex"> J </script> is simply given by: 
+<script type="math/tex; mode=display">
+J = -\displaystyle\frac{1}{m} \displaystyle\sum_{i=1}^{m} \left(y_i \log\hat{y_i} + (1-y_i) \log(1 - \hat{y_i} \right)
+</script>
+
+Now that we have our cost function, our next goal in life is to minimize it. What this means is that we are trying to get the combination of parameters that gives us *the least difference between our predicted values and the ground truth*. 
+
+We will do that by doing some awesome **numerical optimization**. Let's get started!
+
+## Optimization
+
+... COMING UP TOMORROW ...
+
+
 
 
 [xkcd-standards]: https://xkcd.com/927/
 [deep-learning]: https://www.coursera.org/specializations/deep-learning
-[previous-post]: [week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
+[week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
+[tricking-neural-networks]: https://medium.com/@ageitgey/machine-learning-is-fun-part-8-how-to-intentionally-trick-neural-networks-b55da32b7196
+[loss-functions]: https://en.wikipedia.org/wiki/Loss_functions_for_classification
