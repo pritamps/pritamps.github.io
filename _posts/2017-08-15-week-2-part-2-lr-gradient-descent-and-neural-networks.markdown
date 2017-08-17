@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Logistic Regression and Neural Networks - Part 2: An Introduction to Optimization"
+title:  "[IN PROGRESS] - Logistic Regression and Neural Networks - Part 2: An Introduction to Optimization"
 date:   2017-08-15 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression
 latexscript: js/katex_render.js
