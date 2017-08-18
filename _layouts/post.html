@@ -11,6 +11,10 @@ layout: default
   {{ content }}
 </div>
 
+{% if site.disqus.shortname %}
+  {% include disqus_comments.html %}
+{% endif %}
+
 {% if page.latexscript %}
   <script type="text/javascript">
     {% include {{ page.latexscript }} %}
