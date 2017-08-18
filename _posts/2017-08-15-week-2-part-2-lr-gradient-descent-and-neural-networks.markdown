@@ -6,7 +6,6 @@ categories: deeplearning neuralnetworks logisticregression
 latexscript: js/katex_render.js
 ---
 
-{{ page.url | absolute_url }}
 
 X.Y.Z
 
