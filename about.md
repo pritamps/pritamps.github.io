@@ -16,7 +16,7 @@ After Pre University (or High School as it's called in the US), I got into Aeros
 
 These days, I feel that I have the freedom to again do things because I'm interested in them, so I've started learning things for no other reason than fun: iOS programming, a return to my Machine Learning days, Deep Learning, Functional Programming and who knows what else. 
 
-Whatever I do, I hope I have the patience to see it through to the end (as Neil Gaiman said, "you learn by finishing things"), and I hope I regularly update this space with tutorials, opinions, and articls on all things technical.
+Whatever I do, I hope I have the patience to see it through to the end (as Neil Gaiman said, "you learn by finishing things"), and I hope I regularly update this space with tutorials, opinions, and articles on all things technical.
 
 I also write about my travels and other non-technical things at [my personal website][my-site]. I hope you follow me on both these places because both these distinct parts of my life are very important to me.
 
