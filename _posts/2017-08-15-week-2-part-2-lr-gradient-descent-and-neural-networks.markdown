@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "[IN PROGRESS] - Logistic Regression and Neural Networks - Part 2: An Introduction to Optimization"
+title:  "Logistic Regression and Neural Networks - Part 2: Defining the Problem"
 date:   2017-08-15 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression
 latexscript: js/katex_render.js
 ---
 
-In the [previous post][previous-post], I introduced the basic idea behind logistic regression and the notation for:
+In the [previous post][week-2-part-1], I introduced the basic idea behind logistic regression and the notation for:
 
 1. **One input**: <script type="math/tex"> x \in \mathbb{R}^{n_x} </script>, a feature vector extracted from whatever our data source is, and <script type="math/tex"> n_x </script> is the number of features
 2. **One training label**: <script type="math/tex"> y \in {0,1}</script>
@@ -92,17 +92,73 @@ J = -\displaystyle\frac{1}{m} \displaystyle\sum_{i=1}^{m} \left(y_i \log\hat{y_i
 
 Now that we have our cost function, our next goal in life is to minimize it. What this means is that we are trying to get the combination of parameters that gives us *the least difference between our predicted values and the ground truth*. 
 
-We will do that by doing some awesome **numerical optimization**. Let's get started!
+We will do that by doing some awesome **numerical optimization** (because it turns out there isn't an easy theoretical solution to this problem above). Let's get started!
 
 ## Optimization
 
-... COMING UP TOMORROW ...
+Before we proceed, here's some new notation: 
+<script type="math/tex; mode=display">
+\begin{aligned}
+a &= \hat{y} \\
+z &= w^Tx + b
+\end{aligned}
+</script>
 
+With that ready, let's define our problem:
 
+### The Problem
+<script type="math/tex; mode=display">
+\begin{aligned}
+\text{Minimize } J(w, b) &=  -\frac{1}{m} \displaystyle \sum_{i=1}^{m} \left(y_i \log a + (1-y_i) \log(1 - a \right) \\
+\text{where: } a(w, b) &= \hat{y} = \sigma(w^Tx + b) = \sigma(z)
+\end{aligned}
+</script>
 
+For reasons I won't get into here (at least not in this post), but are extremely interesting nonetheless, this problem cannot be solved analytically. But basically, you can see even by looking at it (with it's sigmoid function and the logs running around the place) that it's going to be huge pain taking an analytical path.
+
+So, we go...numerical! 
+
+## Gradient Descent
+
+Any numerical algorithm for optimisation follows this basic logic:
+
+1. Assume a starting point
+2. Decide a direction to go in, based on some logic
+3. Take a step in that direction
+4. Repeat Steps 2 and 3 till you've converged. The logic of convergence is up to you.
+
+An algorithm *very* commonly used for numerical optimisation problems is Gradient Descent. This algorithm has a very cool logic for taking steps that's best explained with an analogy. If you're walking down a hill towards a valley. There's no path, and you don't know which direction to go, and for some reason, you can't see the valley. What do you do? Here's your thoughts as I have thought them for you:
+
+1. As long as you're walking down, you're going towards the valley. That much is true. You might end up in an adjacent valley, but I guess that's still better than staying on the hill? So conclusion: *Going down is good*.
+2. But you can go straight down, you can go down at this angle, or that angle...how do you choose? On normal hills, you would choose a safe path. But since this hill is special, all paths are safe. So obviously, since we want to get to our valley fast, we will choose the angle that gives us *steepest* path, so we check all the angles and take the one that takes the steepest down.
+3. We're going down, down, down, making good progress on our steepest paths. How do we know when we've reached a valley? You got it! We know we've reached a valley when we've stopped going down, i.e. the hill has become flat. Or we start going up again!
+
+It turns out (not by coincidence, but by math), that the steepest path down a function's surface corresponds to the direction of its gradient. To put in terms of our four steps above, gradient descent involves:
+
+1. Assume starting values for all parameters <script type="math/tex"> *w, b) </script> in our case
+2. Calculate the gradient: The gradient is basically <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial w} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script> 
+3. Update the parameters: 
+<script type="math/tex; mode=display">
+\begin{aligned}
+w &= w - \alpha \frac{ \partial J}{\partial w} \\
+b &= b - \alpha \frac{ \partial J}{\partial b}
+\end{aligned}
+</script>
+4. Repeat till convergence, i.e till the values of <script type="math/tex"> w </script> and <script type="math/tex"> b </script> don't change much with new iterations
+
+"Wait a minute. What's that <script type="math/tex"> \alpha </script> there?", one of you asks.
+
+Sorry for jumping that on you, but that's what happened in the lectures as well. <script type="math/tex"> \alpha </script> is the <mark>learning rate</mark>. It turns out that gradient descent sometimes skips the minimum. Think of it as you're going down a hill, but you're a giant, and after you find the direction of steepest descent (you're a giant with very good eyesight), you take a step, but you end up on the next hill! That's why we use the learning rate.
+
+## To Be Continued...
+
+We've defined the algorithm, but this post is getting long, and the next part is also quite long: calculating the derivatives and actually going through and applying gradient descent fully to this problem. An example with only two features will be provided, and then we'll extend it to the general case.
+
+Also coming up in that post will be **Vectorization**, aka trying to make even Python a decently fast language!
 
 [xkcd-standards]: https://xkcd.com/927/
 [deep-learning]: https://www.coursera.org/specializations/deep-learning
 [week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
 [tricking-neural-networks]: https://medium.com/@ageitgey/machine-learning-is-fun-part-8-how-to-intentionally-trick-neural-networks-b55da32b7196
 [loss-functions]: https://en.wikipedia.org/wiki/Loss_functions_for_classification
+[computational-graph]: https://colah.github.io/posts/2015-08-Backprop/
