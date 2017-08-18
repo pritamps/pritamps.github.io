@@ -8,6 +8,8 @@ latexscript: js/katex_render.js
 
 {{ page.url | absolute_url }}
 
+X.Y.Z
+
 In the [previous post][week-2-part-1], I introduced the basic idea behind logistic regression and the notation for:
 
 1. **One input**: <script type="math/tex"> x \in \mathbb{R}^{n_x} </script>, a feature vector extracted from whatever our data source is, and <script type="math/tex"> n_x </script> is the number of features
