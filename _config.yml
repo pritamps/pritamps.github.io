@@ -18,7 +18,7 @@ email: pritamps@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   My space on the internet to write about Computer Science (and Aerospace?) related things
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://pritamps.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: pritamps
 github_username:  pritamps
 
