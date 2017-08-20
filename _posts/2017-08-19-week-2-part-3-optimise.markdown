@@ -6,7 +6,7 @@ categories: deeplearning neuralnetworks logisticregression optimization
 latexscript: js/katex_render.js
 ---
 
-Well come to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in [Part 1][week-2-part-1] and then defined the optimization problem in [Part 2][week-2-part-2]. In this episode, we'll first develop an algorithm to solve it by iterating through the examples and then use the awesome power of matrices to go through all examples once. So, let's get started, yeah?
+Welcome to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in [Part 1][week-2-part-1] and then defined the optimization problem in [Part 2][week-2-part-2]. In this episode, we'll first develop an algorithm to solve the problem by iterating through the examples, and then use the awesome power of vectorization to go through all examples at once. So, let's get started, yeah?
 
 Remember the problem? No? Here it is again:
 
@@ -18,7 +18,7 @@ Remember the problem? No? Here it is again:
 </script>
 Refer to [Part 1][week-2-part-1] (and [Part 2][week-2-part-2] too I guess) if you're unclear on what any of those letters mean.
 
-The algorithm (also copied from [Part 2][week-2-part-2]) was shown to be:
+The algorithm (also developed in [Part 2][week-2-part-2]) was shown to be:
 
 1. Assume starting values for all parameters <script type="math/tex"> (w, b) </script> in our case
 2. Calculate the gradient: The gradient is basically <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial w} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script> 
