@@ -11,8 +11,8 @@ Here are the posts in order so you can find them all from the same landing page:
 
 1. [Introduction to Deep Learning][week-1]: where I give a bird's eye of what deep learning is
 2. [Logistic Regression and Neural Networks - Part 1: The Medium-Size Picture][week-2-part-1]: where I introduce the notation we will be using through this tutorial series, and talk a bit about logistic regression and how it relates to neural networks
-3. [Logistic Regression and Neural Networks - Part 2: Defining the Problem][week-2-part-2]: where I introduce even more notation, try to explain why wen need optimization, talk a bit about the idea behind gradient descent, and finally define the optimization problem.
-4. [Logistic Regression and Neural Networks - Part 3: Optimize!]: where I go through a simple example illustrating gradient descent, and then scare you with big matrices. 
+3. [Logistic Regression and Neural Networks - Part 2: Defining the Problem][week-2-part-2]: where I introduce even more notation, try to explain why we need optimization, talk a bit about the idea behind gradient descent, and finally define the optimization problem.
+4. [Logistic Regression and Neural Networks - Part 3: Optimize][week-2-part-3]: where I go through a simple example illustrating gradient descent, and then scare you with big matrices. 
 
 The idea to do this series came after I registed for the new [Deep Learning specialisation][deep-learning] on Coursera. It's taught by Andrew Ng, one of the most well-known names in Machine Learning.
 
@@ -30,3 +30,4 @@ I intend to use this post as a landing page for the tutorial series. I'll link t
 [week-1]: {{ site.baseurl }}{% post_url 2017-08-11-week-1-intro-to-nn %}
 [week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
 [week-2-part-2]: {{ site.baseurl }}{% post_url 2017-08-15-week-2-part-2-lr-gradient-descent-and-neural-networks %}
+[week-2-part-3]: {{ site.baseurl }}{% post_url 2017-08-19-week-2-part-3-optimise %}
