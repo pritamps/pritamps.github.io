@@ -143,7 +143,7 @@ The matrices and vectors involved are:
 <script type="math/tex; mode=display">
 \begin{aligned}
 X_{n_x \times m} &= [x^{(1)}, x^{(2)}, \ldots, x^{(m)}] \\
-y_{n_x \times 1} &= [y^{(1)}, y^{(2)}, \ldots, y^{(m)}] \\
+y_{1 \times m} &= [y^{(1)}, y^{(2)}, \ldots, y^{(m)}] \\
 w_{m \times 1}^T &= [w_1, w_2, \ldots, w_m] \\
 Z &= [z^{(1)}, z^{(2)}, \ldots z^{(m)}] \\
   &= w^TX + [b, b, \ldots b]_{1 \times m}
