@@ -9,12 +9,16 @@ Welcome to my Deep Learning Tutorial Series!
 
 Here are the posts in order so you can find them all from the same landing page:
 
-1. [Introduction to Deep Learning][week-1]: where I give a bird's eye of what deep learning is
-2. [Logistic Regression and Neural Networks - Part 1: The Medium-Size Picture][week-2-part-1]: where I introduce the notation we will be using through this tutorial series, and talk a bit about logistic regression and how it relates to neural networks
-3. [Logistic Regression and Neural Networks - Part 2: Defining the Problem][week-2-part-2]: where I introduce even more notation, try to explain why we need optimization, talk a bit about the idea behind gradient descent, and finally define the optimization problem.
-4. [Logistic Regression and Neural Networks - Part 3: Optimize][week-2-part-3]: where I go through a simple example illustrating gradient descent, and then scare you with big matrices. 
+1. [Introduction to Deep Learning][week-1]: A bird's eye of what deep learning is why it's become so popular these days
+2. Logistic Regression and Neural Networks: An exploration of the idea behind Neural Networks (actually, just one neuron for this part) using a Logistic Regression, a a popular Machine Learning Algorithm.
+    - [Part 1: The Medium-Size Picture][week-2-part-1]: An introduction to the notation we will be using through this tutorial series, and talk a bit about logistic regression and how it relates to neural networks
+    - [Part 2: Defining the Problem][week-2-part-2]: Even more notation, an attempt to explain why we need optimization, a bit about the idea behind gradient descent, and finally the definition of the optimization problem.
+    - [Part 3: Optimization with Forward and Back Propagation][week-2-part-3]: A simple example illustrating gradient descent, the idea behind forward and back propagation, the vectorized formulation of the optimization problem.
+3. Shallow Neural Networks: An exploration of neural networks with only one, or maybe just a few more, layers. This set of posts will be useful to understand how neural networks work "under the hood" (or rather, as far under the hood as we can see) and just as importantly, how they are represented.
+    - Part 1: Representation: COMING SOON!
 
-The idea to do this series came after I registed for the new [Deep Learning specialisation][deep-learning] on Coursera. It's taught by Andrew Ng, one of the most well-known names in Machine Learning.
+
+The idea to do this series came after I registered for the new [Deep Learning specialisation][deep-learning] on Coursera. It's taught by Andrew Ng, one of the most well-known names in Machine Learning.
 
 This tutorial series is serving multiple purposes:
 

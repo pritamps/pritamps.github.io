@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Logistic Regression and Neural Networks - Part 3: Optimize with Forward and Back Propagation!"
+title:  "Logistic Regression and Neural Networks - Part 3: Optimization with Forward and Back Propagation!"
 date:   2017-08-15 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression optimization
 latexscript: js/katex_render.js
