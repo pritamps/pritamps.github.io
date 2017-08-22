@@ -159,7 +159,7 @@ A &= \sigma(Z) \\
 dZ &= A - Y \\
    &= [(a^{(1)} - y^{(1)}), (a^{(2)} - y^{(2)}), \ldots, (a^{(m)} - y^{(m)})] \\
 dw &= \displaystyle \frac{1}{m} \displaystyle \sum XdZ^T \\
-db &= \displaystyle \sum(dZ)
+db &= \displaystyle \frac{1}{m} \displaystyle \sum(dZ)
 \end{aligned}
 
 </script>
