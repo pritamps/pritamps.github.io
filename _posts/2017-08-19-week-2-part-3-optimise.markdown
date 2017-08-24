@@ -170,7 +170,8 @@ These matrix operations will replace the inside of the for loop in the algorithm
 
 So, there we have it. After a long and winding road, we've gone through what it would take to do logistic regression using neural networks. Note that we *still have only one neuron*!
 
-Until nex time, adios! Please feel free to leave comments below with questions, or complaints that I've been too vague or too wordy or too crazy.
+Until next time, adios! Please feel free to leave comments below with questions, or complaints that I've been too vague or too wordy or too crazy.
+
 
 
 [deep-learning]: https://www.coursera.org/specializations/deep-learning

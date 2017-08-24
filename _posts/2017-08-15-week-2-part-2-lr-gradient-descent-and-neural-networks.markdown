@@ -48,7 +48,7 @@ Phew. That's a mouthful isn't it? But you and I, we're going to get used to this
 
 ## The Big Picture
 
-Let's take stock of what we have: we have <script type="math/tex"> n_x </script> examples, each of which is represented in a feature matrix <script type="math/tex"> X_{n_x \times m} </script>. The <script type="math/tex"> i^{th} </script> column in the matrix corresponds to the feature vector for the <script type="math/tex"> i^{th} </script> example.
+Let's take stock of what we have: we have <script type="math/tex"> m </script> examples, each of which is represented in a feature matrix <script type="math/tex"> X_{n_x \times m} </script>. The <script type="math/tex"> i^{th} </script> column in the matrix corresponds to the feature vector for the <script type="math/tex"> i^{th} </script> example.
 
 Our goal at the end of all this is to predict the label for new feature vector. The way we do this is by training our algorithm to *learn* based on all the information we have, i.e. the training examples. 
 
@@ -136,7 +136,7 @@ An algorithm *very* commonly used for numerical optimisation problems is Gradien
 It turns out (not by coincidence, but by math), that the steepest path down a function's surface corresponds to the direction of its gradient. To put in terms of our four steps above, gradient descent involves:
 
 1. Assume starting values for all parameters <script type="math/tex"> (w, b) </script> in our case
-2. Calculate the gradient: The gradient is basically <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial w} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script> 
+2. Calculate the gradient: The gradient is given by <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial b} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script> 
 3. Update the parameters: 
 <script type="math/tex; mode=display">
 \begin{aligned}
