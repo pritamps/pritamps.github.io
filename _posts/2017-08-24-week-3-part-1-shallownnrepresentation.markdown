@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Shallow Neural Networks"
+title:  "Shallow Neural Networks Part 1: Non-code"
 date:   2017-08-24 10:25:00 +0530
 categories: deeplearning neuralnetworks
 latexscript: js/katex_render.js
@@ -89,8 +89,8 @@ Let's see what all this means for our specific neural network.
 ### Layer 0 to Layer 1
 
 {:refdef: style="text-align: center;"}
-![Activations in the Shallow Neural Network]({{ site.url }}/assets/dl_week3/layer0to1.png)
-*Layers and activations*
+![Connecting Layers 0 and 1]({{ site.url }}/assets/dl_week3/layer0to1.png)
+*Layers 0 and 1 connected!*
 {: refdef}
 
 The arrows are connected. Our input is of size <script type="math/tex"> x \in \mathbb{R}_{3 \ times 1} </script>, i.e <script type="math/tex"> n_x = 3 </script>. Layer 1, our hidden layer is of size <script type="math/tex"> n_h^{[1]} = 4 </script>. Note the notation introduced here: <script type="math/tex"> n_h^{[l]} </script> is the number of nodes in hidden layer <script type="math/tex"> l </script>. So, we can write out, with dimensions:
@@ -115,8 +115,8 @@ Now, let's move on to the next layer!
 ### Layer 1 to Layer 2
 
 {:refdef: style="text-align: center;"}
-![Activations in the Shallow Neural Network]({{ site.url }}/assets/dl_week3/layer1to2.png)
-*Layers and activations*
+![Connecting Layers 1 and 2]({{ site.url }}/assets/dl_week3/layer1to2.png)
+*Layers 1 and 2 connected!*
 {: refdef}
 
 The activations and output of the second layer become:
