@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Shallow Neural Networks Part 1: Non-code"
+title:  "Shallow Neural Networks"
 date:   2017-08-24 10:25:00 +0530
 categories: deeplearning neuralnetworks
 latexscript: js/katex_render.js
