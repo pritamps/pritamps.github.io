@@ -23,6 +23,11 @@ Let's find out. But first, we need to play the notation game a bit more, because
 
 Here we go!
 
+## Table of Contents
+{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}
+
 ## Notation
 
 1. **Number of examples**: <script type="math/tex"> m \in \mathbb{R} </script> will represent the number of examples, or images we have. Usually we just use <script type="math/tex"> m </script>, but in case we have a need to differentiate between the training set and the test set, we use:

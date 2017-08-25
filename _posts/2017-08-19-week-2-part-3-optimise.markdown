@@ -1,12 +1,19 @@
 ---
 layout: post
 title:  "Logistic Regression and Neural Networks - Part 3: Optimization with Forward and Back Propagation!"
-date:   2017-08-15 10:25:00 +0530
+date:   2017-08-19 10:25:00 +0530
 categories: deeplearning neuralnetworks logisticregression optimization
 latexscript: js/katex_render.js
 ---
 
 Welcome to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in [Part 1][week-2-part-1] and then defined the optimization problem in [Part 2][week-2-part-2]. In this episode, we'll first develop an algorithm to solve the problem by iterating through the examples, and then use the awesome power of vectorization to go through all examples at once. So, let's get started, yeah?
+
+## Table of Contents
+{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}
+
+## Recap
 
 Remember the problem? No? Here it is again:
 

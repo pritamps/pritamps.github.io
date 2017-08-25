@@ -14,6 +14,11 @@ In the first part, I'll introduce the notation (always a pain) and Logistic Regr
 
 Throughout this tutorial, we'll be using the <mark>cat-or-not problem</mark> to illustrate the mathematical and algorithmic points made. The problem: given an image, the network should be trained to be able to say if there is a cat in it or not; i.e. a simple binary classification problem. 
 
+## Table of Contents
+{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}
+
 ## A Brief Intro to Logistic Regression -- only one input, no learning yet!
 
 Logistic Regression is an algorithm that was developed for binary classification. Let's get with our cat problem to get comfortable with the ideas behind the algorithm, the notations used, and all that jazz. The parameters involved in Logistic Regression are:

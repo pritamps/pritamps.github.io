@@ -6,6 +6,13 @@ categories: deeplearning neuralnetworks
 latexscript: js/katex_render.js
 ---
 
+## Table of Contents
+{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}
+
+## Overview
+
 Technically, [Deep Learning][deep-learning-wiki] is the application of Neural Networks where more than one hidden layer of neurons is involved. In the common form that it has pervaded the media today, it also usually involves a mixture of neural networks with other algorithms specifically applied to large datasets in a variety of areas. 
 
 Don't know what that means? You're in the right place! The idea of this post is to cover just enough ground (in a very shallow way, pun sort-of intended) so that you can say the above paragraph out loud and understand what it means. So the following questions that I'm sure are burning your stomach will be answered:
