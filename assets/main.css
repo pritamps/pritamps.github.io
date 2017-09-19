@@ -74,8 +74,9 @@ pre > code { border: 0; padding-right: 0; padding-left: 0; }
   .post-header .post-title { font-size: 32pt; font-weight: bold; }
   .image-wrapper { border: 1px solid black; }
   @media (max-width: 768px) { .container { grid-template-areas: "header" "content" "footer"; grid-template-columns: auto; grid-template-rows: auto 1fr minmax(75px, auto) auto; /* Footer */ }
-    main { grid-area: content; padding: 20px; }
-    .site-header { grid-area: header; height: 30vh; width: 100%; position: static; align-self: center; } } }
+    main { padding: 20px; }
+    .site-header { grid-area: header; height: 30vh; width: 100%; position: static; align-self: center; }
+    .post-list ul > li, .post-info { display: inherit; border-bottom: 1px solid #777777; padding-bottom: 5px; margin-bottom: 10px; } } }
 .post p { padding: 10px; line-height: 1.7em; text-indent: 20px; }
 
 .post img + em { display: block; text-align: center; font-size: 10pt; margin-bottom: 20px; }
