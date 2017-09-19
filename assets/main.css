@@ -61,7 +61,7 @@ pre > code { border: 0; padding-right: 0; padding-left: 0; }
   .site-footer .contact_info ul { list-style: none; display: inline-block; }
   .site-footer .social_media ul > li { display: inline-block; }
   main { grid-area: content; display: grid; grid-template-columns: 1fr minmax(auto, 46em) 1fr; align-content: start; grid-template-areas: ". post contents" ". post contents" ". comments ."; }
-  main .post, main .page { grid-area: post; display: grid; padding-top: 60px; }
+  main .post, main .page { padding-left: 20px; padding-right: 20px; grid-area: post; display: grid; padding-top: 60px; }
   main .table-of-contents { grid-area: contents; }
   main .comments { grid-area: comments; }
   .page-heading { text-align: center; font-size: 40pt; font-weight: bold; padding: 20px; margin-bottom: 20px; border-bottom: 2px solid black; }
@@ -73,13 +73,13 @@ pre > code { border: 0; padding-right: 0; padding-left: 0; }
   .post-header { padding: 20px; text-align: center; }
   .post-header .post-title { font-size: 32pt; font-weight: bold; }
   .image-wrapper { border: 1px solid black; }
-  .equation { display: table; white-space: nowrap; max-width: 100%; overflow-x: scroll; overflow: auto; text-align: initial; }
+  .equation { display: table; max-width: 100%; overflow-x: scroll; }
   @media (max-width: 768px) { .container { grid-template-areas: "header" "content" "footer"; grid-template-columns: auto; grid-template-rows: auto 1fr minmax(75px, auto) auto; /* Footer */ }
-    main { padding: 20px; }
+    main { width: 100%; }
     .site-header { grid-area: header; height: 30vh; width: 100%; position: static; align-self: center; }
     .post-list ul > li, .post-info { display: inherit; border-bottom: 1px solid #777777; padding-bottom: 5px; margin-bottom: 10px; }
-    .equation > .katex { display: table; white-space: nowrap; max-width: 100%; text-align: initial; }
-    .katex { font: normal 0.9em KaTeX_Main, Times New Roman, serif; line-height: 1.2; white-space: normal; text-indent: 0; } } }
+    .equation { display: table; white-space: nowrap; text-align: initial; }
+    .katex { font: normal 1em KaTeX_Main, Times New Roman, serif; line-height: 1.2; white-space: normal; text-indent: 0; overflow-x: auto; } } }
 .post p { padding: 10px; line-height: 1.7em; text-indent: 20px; }
 
 .post img + em { display: block; text-align: center; font-size: 10pt; margin-bottom: 20px; }
