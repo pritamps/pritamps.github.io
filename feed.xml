@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-19T12:42:01+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
+</subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Shallow Neural Networks</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html" rel="alternate" type="text/html" title="Shallow Neural Networks" /><published>2017-08-24T10:25:00+05:30</published><updated>2017-08-24T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html">&lt;p&gt;Before we get neck-deep into deep neural networks, let’s wade into shallow waters and use a two layer network (one hidden layer, one output layer) to explore properites of neural networks in general. Let’s see how the notation extends to multiple layers, and what it means for our matrix computations and math.&lt;/p&gt;
+
+&lt;p&gt;Here’s the mother-diagram for the rest of this post.&lt;/p&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week3/shallow_nn.png&quot; alt=&quot;Shallow Neural Network Representation&quot; /&gt;
+&lt;em&gt;Why the ugly diagram? I just bought one of those drawing tables, so I’m learning how to use it!&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I’m going to do something silly, just because I can. Even though you probably understand this diagram already, I’m going to build it from the ground up. For even more understanding. Not sure what I mean? Well, read on!&lt;/p&gt;
+
+&lt;h2 class=&quot;no_toc&quot; id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-layers&quot; id=&quot;markdown-toc-the-layers&quot;&gt;The Layers&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#why-is-the-hidden-layer-called-a-hidden-layer&quot; id=&quot;markdown-toc-why-is-the-hidden-layer-called-a-hidden-layer&quot;&gt;Why is the hidden layer called a hidden layer?&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-activations&quot; id=&quot;markdown-toc-the-activations&quot;&gt;The Activations&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#connecting-the-layers&quot; id=&quot;markdown-toc-connecting-the-layers&quot;&gt;Connecting the Layers&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#layer-0-to-layer-1&quot; id=&quot;markdown-toc-layer-0-to-layer-1&quot;&gt;Layer 0 to Layer 1&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#layer-1-to-layer-2&quot; id=&quot;markdown-toc-layer-1-to-layer-2&quot;&gt;Layer 1 to Layer 2&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-full-network&quot; id=&quot;markdown-toc-the-full-network&quot;&gt;The Full Network&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#training-with-multiple-examples&quot; id=&quot;markdown-toc-training-with-multiple-examples&quot;&gt;Training With Multiple Examples&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#gradient-descent&quot; id=&quot;markdown-toc-gradient-descent&quot;&gt;Gradient Descent&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#initialisation&quot; id=&quot;markdown-toc-initialisation&quot;&gt;Initialisation&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#forward-propagation&quot; id=&quot;markdown-toc-forward-propagation&quot;&gt;Forward Propagation&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#back-propagation&quot; id=&quot;markdown-toc-back-propagation&quot;&gt;Back Propagation&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;the-layers&quot;&gt;The Layers&lt;/h2&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week3/layers.png&quot; alt=&quot;Layers in the Shallow Neural Network&quot; /&gt;
+&lt;em&gt;Just the layers&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, this neural network has three layers:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The input layer (&lt;script type=&quot;math/tex&quot;&gt; l = 0 &lt;/script&gt;): contains the input vector &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;The hidden layer (&lt;script type=&quot;math/tex&quot;&gt; l = 1 &lt;/script&gt;): contains the neurons that do the neural network magic&lt;/li&gt;
+  &lt;li&gt;The output layer (&lt;script type=&quot;math/tex&quot;&gt; l = 2 &lt;/script&gt;): gets us our output &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;But in common terminology, we ignore the input layer when counting (that’s why &lt;script type=&quot;math/tex&quot;&gt; l = 0 &lt;/script&gt; for the input layer), but we do count the output layer. So this network is a &lt;mark&gt;two layer neural network&lt;/mark&gt;.&lt;/p&gt;
+
+&lt;p&gt;Notation: &lt;script type=&quot;math/tex&quot;&gt; L &lt;/script&gt; is the total number of layers and &lt;script type=&quot;math/tex&quot;&gt; l &lt;/script&gt; can refer to any individual layer, i.e. &lt;script type=&quot;math/tex&quot;&gt; l \in {0, 1, \ldots L} &lt;/script&gt;. In our example neural network above, &lt;script type=&quot;math/tex&quot;&gt; L = 2 &lt;/script&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;why-is-the-hidden-layer-called-a-hidden-layer&quot;&gt;Why is the hidden layer called a hidden layer?&lt;/h3&gt;
+
+&lt;p&gt;The reason that the hidden layer is called “hidden” is that &lt;mark&gt;we don't see the values the weights there get during training&lt;/mark&gt;. After the network is trained, we input &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;, and get our predicted label &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt;. We don’t know what all the layers in between are doing. As far as we’re concerned, they’re &lt;em&gt;hidden&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-activations&quot;&gt;The Activations&lt;/h2&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week3/activations.png&quot; alt=&quot;Activations in the Shallow Neural Network&quot; /&gt;
+&lt;em&gt;Layers and activations&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Each neuron behaves like we’ve already examined &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;before&lt;/a&gt;: it applies a linear transformation ( &lt;script type=&quot;math/tex&quot;&gt; z = w^Tx + b &lt;/script&gt; ) and then an activation function to it ( &lt;script type=&quot;math/tex&quot;&gt; a(z) = g(w^Tx + b) &lt;/script&gt;). With that in mind, we are ready to introduce our new notation for a node.&lt;/p&gt;
+
+&lt;p&gt;For &lt;mark&gt;an individual node &lt;script type=&quot;math/tex&quot;&gt; i &lt;/script&gt; in layer &lt;script type=&quot;math/tex&quot;&gt; l &lt;/script&gt;&lt;/mark&gt;, the activation function is given by:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+a^{[l]}_i &amp;= g (z^{[l]}_i) \\
+          &amp;= g (w^{[l]^T}_i x + b^{[L]}_i)  
+\end{aligned}
+&lt;/script&gt;
+
+&lt;h2 id=&quot;connecting-the-layers&quot;&gt;Connecting the Layers&lt;/h2&gt;
+&lt;p&gt;With individual nodes done, we turn to connecting the layers. The notation here now develops so that &lt;mark&gt;for layer  &lt;script type=&quot;math/tex&quot;&gt; l &lt;/script&gt;&lt;/mark&gt;, &lt;script type=&quot;math/tex&quot;&gt; a^{[l]} &lt;/script&gt; represents the vector of all the individual activations,  &lt;script type=&quot;math/tex&quot;&gt; w^{[l]} &lt;/script&gt; represents that &lt;em&gt;matrix&lt;/em&gt; of all weights and so on. Thus, we can write:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+a^{[l]} = g (W^{[l]} a^{[l-1]}+ b^{[l]})
+&lt;/script&gt;
+
+&lt;p&gt;Note how I slyly slipped in &lt;script type=&quot;math/tex&quot;&gt; a^{[l-1]} &lt;/script&gt; instead of &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt; in there. If you think about it, it makes sense, because the &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt; for each layer is just the output of the layer that came before it. afsdf&lt;/p&gt;
+
+&lt;p&gt;The weight vector got upgraded to a capital &lt;script type=&quot;math/tex&quot;&gt; W &lt;/script&gt; because it’s now a matrix. Note that the &lt;mark&gt;Weight Matrix has the weight vectors stacked row-wise instead of column-wise&lt;/mark&gt;. This is beacuse, as far as I can tell, because Andrew said so in the course, and it makes for easier multiplication, i.e.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+W^{[l]}_{n_l \times n_{l-1}} = \begin{bmatrix}
+w^{[1]^T}_1 \\
+w^{[1]^T}_2 \\
+. \\
+.\\
+w^{[1]^T}_{n_l}
+\end{bmatrix}
+&lt;/script&gt;
+
+&lt;p&gt;The dimensions &lt;script type=&quot;math/tex&quot;&gt; n_l &lt;/script&gt;  and &lt;script type=&quot;math/tex&quot;&gt; n_{l-1} &lt;/script&gt; refer to the number of nodes/neurons in layers &lt;script type=&quot;math/tex&quot;&gt; l &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; l-1 &lt;/script&gt; respectively. This will become clearer as we move through the rest of this post.&lt;/p&gt;
+
+&lt;p&gt;Let’s see what all this means for our specific neural network.&lt;/p&gt;
+
+&lt;h3 id=&quot;layer-0-to-layer-1&quot;&gt;Layer 0 to Layer 1&lt;/h3&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week3/layer0to1.png&quot; alt=&quot;Connecting Layers 0 and 1&quot; /&gt;
+&lt;em&gt;Layers 0 and 1 connected!&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The arrows are connected. Our input is of size &lt;script type=&quot;math/tex&quot;&gt; x \in \mathbb{R}_{3 \ times 1} &lt;/script&gt;, i.e &lt;script type=&quot;math/tex&quot;&gt; n_x = 3 &lt;/script&gt;. Layer 1, our hidden layer is of size &lt;script type=&quot;math/tex&quot;&gt; n_h^{[1]} = 4 &lt;/script&gt;. Note the notation introduced here: &lt;script type=&quot;math/tex&quot;&gt; n_h^{[l]} &lt;/script&gt; is the number of nodes in hidden layer &lt;script type=&quot;math/tex&quot;&gt; l &lt;/script&gt;. So, we can write out, with dimensions:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+z^{[1]}_{4 \times 1} &amp;= W^{[1]}_{ 4 \times 3} a^{[0]}_{3 \times 1} + b^{[1]}_{4 \times 1} \\
+\text{where } a^{[0]} &amp;= x
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;Using the activation functions, we get;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+a^{[1]}_{4 \times 1} = g^{[1]} (z^{[1]})
+&lt;/script&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt; g^{[1]} &lt;/script&gt; represents the array of activation functions for the first layer. Yes, this means each individual node gets its own activation function, a fact I’m conveniently glossing over for the purposes of this post. I’ll talk about it in another post.&lt;/p&gt;
+
+&lt;p&gt;Now, let’s move on to the next layer!&lt;/p&gt;
+
+&lt;h3 id=&quot;layer-1-to-layer-2&quot;&gt;Layer 1 to Layer 2&lt;/h3&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week3/layer1to2.png&quot; alt=&quot;Connecting Layers 1 and 2&quot; /&gt;
+&lt;em&gt;Layers 1 and 2 connected!&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The activations and output of the second layer become:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+z^{[2]}_{1 \times 1} &amp;= W^{[2]}_{ 1 \times 4} a^{[1]}_{4 \times 1} + b^{[2]}_{1 \times 1} \\
+\hat{y} &amp;= a^{[2]} = g^{[2]} (z^{[2]})
+\end{aligned}
+&lt;/script&gt;
+
+&lt;h2 id=&quot;the-full-network&quot;&gt;The Full Network&lt;/h2&gt;
+&lt;p&gt;That’s it! That’s our full network. So, to summarize, the equations are:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+z^{[1]}_{4 \times 1} &amp;= W^{[1]}_{ 4 \times 3} a^{[0]}_{3 \times 1} + b^{[1]}_{4 \times 1}  \text{ where } a^{[0]} = x \\
+a^{[1]}_{4 \times 1} &amp;= g^{[1]}(z^{[1]}) \\
+z^{[2]}_{1 \times 1} &amp;= W^{[2]}_{ 1 \times 4} a^{[1]}_{4 \times 1} + b^{[2]}_{1 \times 1} \\
+\hat{y}_{1 \times 1} &amp;= a^{[2]}_{1 \times 1} = g^{[2]} (z^{[2]})
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;You might be wondering why I’m insistently putting the sizes on there. Well, it’s because these matrix sizes are my Achilles Heel. I get confused with every aspect of them: rows and columns, sizes, dot products, multiplications. So I have to be careful. If you see something wrong there, let me know!&lt;/p&gt;
+
+&lt;h2 id=&quot;training-with-multiple-examples&quot;&gt;Training With Multiple Examples&lt;/h2&gt;
+
+&lt;p&gt;If you hadn’t noticed so far, let me be the one to remind you that everything we did so far was for one training example. But of course, for our neural network, we have &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; training example, i.e. it’s matrix time! We’ve done most of this in&lt;/p&gt;
+
+&lt;p&gt;Our training matrix &lt;script type=&quot;math/tex&quot;&gt; X &lt;/script&gt; is just the individual feature vectors stacked next to each other:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+X_{3 \times m} &amp;= \displaystyle \left[ x^{(1)}_{3\times 1} \quad \ldots \quad x^{(m)}_{3 \times 1} \right] \\
+\text{i.e. }A^{[0]}_{3 \times m} &amp;= X = \displaystyle \left[ a^{[0](1)} \quad \ldots \quad a^{[0](m)} \right]
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;Yup, that’s right. We now have square brackets AND parantheses. What a wonderful time to be alive!&lt;/p&gt;
+
+&lt;p&gt;Traversing through to layer 1, we get&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+Z^{[1]}_{4 \times m} &amp;= W^{[1]^T}_{4 \times 3} A^{[0]}_{3 \times m} + b^{[1]}_{4 \times 1} \\
+                    &amp;= \displaystyle \left[ z^{[1](1)}_{4\times 1} \quad \ldots \quad z^{[1](m)}_{4\times 1} \right] \\
+A^{[1]}_{4 \times m} &amp;= g^{[1]}(Z^{[1]}) \\
+                    &amp;= \displaystyle \left[ a^{[1](1)}_{4\times 1} \quad \ldots \quad a^{[1](m)}_{4\times 1} \right]
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;And then onto layer 2 (the output layer, &lt;mark&gt;our predictions&lt;/mark&gt;), our matrices are updated as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+Z^{[2]}_{m \times 1} &amp;= W^{[2]^T}_{1 \times 4} A^{[1]}_{4 \times m} + b^{[2]}_{1 \times 1} \\
+\hat{Y}_{m \times 1} &amp;= A^{[2]} = g^{[2]}(Z^{[2]})
+\end{aligned}
+&lt;/script&gt;
+
+&lt;h2 id=&quot;gradient-descent&quot;&gt;Gradient Descent&lt;/h2&gt;
+
+&lt;p&gt;Phew. That’s our problem and the network defined. Now we’re ready to do our gradient descent. If you need a refresher, look &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise.html&quot;&gt;here&lt;/a&gt; where we did this for a single neuron. Thankfully, differentiation is linear, and our derivatives are linearly independent (if you don’t care what those terms mean, you can still be a great deep learning guy, don’t worry!), what applies to one neuron easily extends to the full set. The basic steps are:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Initialize &lt;script type=&quot;math/tex&quot;&gt; W, b &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Find updates through forward propagation and backpropagation&lt;/li&gt;
+  &lt;li&gt;Repeat step 2 till convergence. Simple?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let’s get started then?&lt;/p&gt;
+
+&lt;h3 id=&quot;initialisation&quot;&gt;Initialisation&lt;/h3&gt;
+
+&lt;p&gt;For &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise.html&quot;&gt;our problem in the previous post&lt;/a&gt; involving a single neuron and logistic regression, we said it was fine to initialize all variables to zero. I mean there’s a single neuron, and it can learn anyway.  Here, we have &lt;em&gt;multiple neurons&lt;/em&gt; (in fact a whole network!), and initialising them to zero won’t work. Even initialising all of them to the same value won’t work.&lt;/p&gt;
+
+&lt;p&gt;Any guesses why?&lt;/p&gt;
+
+&lt;p&gt;I’m not sure if you got that right or wrong, so I’m just going to tell you. It’s because, if you initialise all of them to the same value, they will all be computing the same function as the “signal passes through the network”. What that means is that instead of a whole layer, you might just have one big neuron! Cool logic, eh?&lt;/p&gt;
+
+&lt;p&gt;Instead, we initialise all these things to small values, between 0 and 1 usually. They’re small because some of our choices for activation functions have nice non-zero values for their derivatives close to zero.&lt;/p&gt;
+
+&lt;h3 id=&quot;forward-propagation&quot;&gt;Forward Propagation&lt;/h3&gt;
+
+&lt;p&gt;We’ve done this before already in this very post, so I’ll just write out the equations. The only change here will be that the &lt;mark&gt;activation function in the final layer will always be the sigmoid &lt;script type=&quot;math/tex&quot;&gt; \sigma(z)&lt;/script&gt;&lt;/mark&gt;, while the other activation functions are up to us. The reasoning for this will be explained later (or not all, I haven’t decided yet!).&lt;/p&gt;
+
+&lt;p&gt;So, the forward propagation update is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+Z^{[1]} &amp;= W^{[1]} A^{[0]} + b^{[1]} \\
+A^{[1]} &amp;= g^{[1]}(Z^{[1]}) \\
+Z^{[2]} &amp;= W^{[2]} A^{[1]} + b^{[2]} \\
+A^{[2]} &amp;= g^{[2]}(Z^{[2]})   \\
+        &amp;= \sigma(Z^{[2]})
+\end{aligned}
+&lt;/script&gt;
+
+&lt;h2 id=&quot;back-propagation&quot;&gt;Back Propagation&lt;/h2&gt;
+
+&lt;p&gt;The math involved in calculating the derivatives is very complicated. I know because Andrew Ng said so! But also, I remember it being a pain when I learnt neural networks in graduate school. It’s actually &lt;em&gt;very interesting&lt;/em&gt; to get into matrix calculus, but maybe I’ll do it in a post of its own. Here are the back-propagation update rules, &lt;mark&gt;written for the second layer first and then the first layer&lt;/mark&gt; because hey, we’re going backwards!&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+dZ^{[2]} &amp;= A^{[2]} - Y \text { where } Y_{m \times 1} \text{ are the training labels } \\
+dW^{[2]} &amp;= \frac{1}{m} dZ^{[2]}A^{[1]^T} \\
+db^{[2]} &amp;= \frac{1}{m} \sum dZ^{[2]} \\
+dZ^{[1]} &amp;= \left( W^{[2]^T}dZ^{[2]} \right) \cdot \left( g^{\prime[2]}(Z^{[1]}) \right) \\
+dW^{[1]} &amp;= \frac{1}{m} dZ^{[1]}A^{[0]^T}   \\
+db^{[1]} &amp;= \frac{1}{m} dZ^{[1]}
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;There you have it, the six commandments of back-propagation – some crazy math and many PhDs have gone into producing those equations. Phew!&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+&lt;p&gt;I have to say, this is a major achievement. You really should pat yourself on the back for this. We have the general update rules for a single-layer neural network. And even looking at it, you should be able to see that extending this to multiple layers &lt;em&gt;will not be hard&lt;/em&gt;. There’s a certain symmetry about the rules of update, eh?&lt;/p&gt;
+
+&lt;p&gt;Next post, we’ll go into actual deep neural networks! Yay! And after that some code, hopefully.&lt;/p&gt;
+
+&lt;p&gt;For now, if you see any errors here, please leave a comment and I’ll correct it promptly. If you have any questions, also leave a comment and I’ll answer to the best of my abilities!&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Before we get neck-deep into deep neural networks, let’s wade into shallow waters and use a two layer network (one hidden layer, one output layer) to explore properites of neural networks in general. Let’s see how the notation extends to multiple layers, and what it means for our matrix computations and math.</summary></entry><entry><title type="html">Logistic Regression and Neural Networks - Part 3: Optimization with Forward and Back Propagation!</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise.html" rel="alternate" type="text/html" title="Logistic Regression and Neural Networks - Part 3: Optimization with Forward and Back Propagation!" /><published>2017-08-19T10:25:00+05:30</published><updated>2017-08-19T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise.html">&lt;p&gt;Welcome to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;Part 1&lt;/a&gt; and then defined the optimization problem in &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html&quot;&gt;Part 2&lt;/a&gt;. In this episode, we’ll first develop an algorithm to solve the problem by iterating through the examples, and then use the awesome power of vectorization to go through all examples at once. So, let’s get started, yeah?&lt;/p&gt;
+
+&lt;h2 class=&quot;no_toc&quot; id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#recap&quot; id=&quot;markdown-toc-recap&quot;&gt;Recap&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-big-picture&quot; id=&quot;markdown-toc-the-big-picture&quot;&gt;The Big Picture&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-calculation-of-derivatives&quot; id=&quot;markdown-toc-the-calculation-of-derivatives&quot;&gt;The Calculation of Derivatives&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-algorithm-for--m--examples&quot; id=&quot;markdown-toc-the-algorithm-for--m--examples&quot;&gt;The Algorithm for &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; examples&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#vectorization&quot; id=&quot;markdown-toc-vectorization&quot;&gt;Vectorization&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#vectorized-logistic-regression&quot; id=&quot;markdown-toc-vectorized-logistic-regression&quot;&gt;Vectorized Logistic Regression&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;recap&quot;&gt;Recap&lt;/h2&gt;
+
+&lt;p&gt;Remember the problem? No? Here it is again:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+\text{Minimize } J(w, b) &amp;=  -\frac{1}{m} \displaystyle \sum_{i=1}^{m} \left(y_i \log a + (1-y_i) \log(1 - a \right) \\
+\text{where: } a(w, b) &amp;= \hat{y} = \sigma(w^Tx + b) = \sigma(z)
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;Refer to &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;Part 1&lt;/a&gt; (and &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html&quot;&gt;Part 2&lt;/a&gt; too I guess) if you’re unclear on what any of those letters mean.&lt;/p&gt;
+
+&lt;p&gt;The algorithm (also developed in &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html&quot;&gt;Part 2&lt;/a&gt;) was shown to be:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Assume starting values for all parameters &lt;script type=&quot;math/tex&quot;&gt; (w, b) &lt;/script&gt; in our case&lt;/li&gt;
+  &lt;li&gt;Calculate the gradient: The gradient is basically &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial w} \displaystyle\right) &lt;/script&gt;. Note that the derivative &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \frac{ \partial J}{\partial w} &lt;/script&gt; is a vector with the same size as &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Update the parameters: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+w &amp;amp;= w - \alpha \frac{ \partial J}{\partial w} \\
+b &amp;amp;= b - \alpha \frac{ \partial J}{\partial b}
+\end{aligned}
+&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Repeat till convergence, i.e till the values of &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; b &lt;/script&gt; don’t change much with new iterations&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In the &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;lectures&lt;/a&gt;, Andrew Ng took us through an example where he showed how the gradient was calculated. To simplify things, the feature vector was only of size 2. But we’re big girls and boys, so let’s have some fun and make our example general, i.e. of size &lt;script type=&quot;math/tex&quot;&gt; n_x \times 1 &lt;/script&gt;. If that means I have think more as I develop this example, so be it!&lt;/p&gt;
+
+&lt;h2 id=&quot;the-big-picture&quot;&gt;The Big Picture&lt;/h2&gt;
+
+&lt;p&gt;To give you the big picture, I’ve made a small picture:&lt;/p&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;/assets/dl_week2/lr_nn-propagation.png&quot; alt=&quot;Big picture for optimization&quot; /&gt;&lt;em&gt;Forward propagation and Back Propagation&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Note the two newly introduced terms, forward propagation and backward propagation. Here’s what the terms mean:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Forward propagation&lt;/strong&gt;: In this step, the input feature vector is fed through the neuron with the current values of the parameters &lt;script type=&quot;math/tex&quot;&gt; (w, b) &lt;/script&gt;. The cost function &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; is calculated with the fresh values of the outputs. This is where &lt;em&gt;predictions are made&lt;/em&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Back Propagation&lt;/strong&gt;: Here, the derivatives of &lt;script type=&quot;math/tex&quot;&gt; (w, b) &lt;/script&gt; with respect to the cost function &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; are calculated. Then the values of our parameters are updated.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;mark&gt; A quick note on the calculation of derivatives &lt;/mark&gt;: The derivatives are calculated using this &lt;em&gt;awesome, cool, amazing&lt;/em&gt; technique called a &lt;mark&gt;Computational Graph&lt;/mark&gt;. This technique is really cool, and I found someone online who explains it much better than I ever could. Here’s &lt;a href=&quot;https://colah.github.io/posts/2015-08-Backprop/&quot;&gt;his awesome article&lt;/a&gt;. I highly recommend reading through it. It’s much better than the lecture on Computational Graphs in the Coursera course.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-calculation-of-derivatives&quot;&gt;The Calculation of Derivatives&lt;/h2&gt;
+
+&lt;p&gt;So…I’m not going into too much detail here, because most of this is algebra. It is interesting algebra for sure, but the results are sufficient for this post.&lt;/p&gt;
+
+&lt;p&gt;You can do most of the derivations by hand, or even use Wolfram Alpha. I’m just going to list them out.&lt;/p&gt;
+
+&lt;p&gt;Before I do, there is &lt;em&gt;one&lt;/em&gt; important thing I’d like to mention:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\displaystyle \frac{\partial J}{\partial w_i} = \displaystyle \frac{1}{m} \displaystyle \sum_i^m \displaystyle \frac{\partial \mathbb{L(a^{(i)}, y)}}{\partial w_i}
+&lt;/script&gt;
+
+&lt;p&gt;The reason this is true is that we &lt;strong&gt;assume&lt;/strong&gt; the weights are independent of each other, so *only the &lt;script type=&quot;math/tex&quot;&gt; i^{th} &lt;/script&gt; weight corresponds to its partial derivative. The reason this is important is that to calculate &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \frac{\partial J}{\partial w_i}&lt;/script&gt;, we only need to calculate &lt;script type=&quot;math/tex&quot;&gt; \displaystyle\frac{\partial \mathbb{L}}{\partial w_i} &lt;/script&gt;, which is easily found out.&lt;/p&gt;
+
+&lt;p&gt;As promised, here are the significant derivatives involved. All of these are defined for a &lt;em&gt;single&lt;/em&gt; example:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+\displaystyle \frac{\partial \mathbb{J}}{\partial a} &amp;= \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial a} = \frac{1}{m} \left( -\frac{y}{a} + \frac{1-y}{1-a} \right) \\
+\displaystyle \frac{\partial \mathbb{J}}{\partial z} &amp;= \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial z} = \frac{1}{m} (a - y) \\
+\displaystyle \frac{\partial \mathbb{J}}{\partial w_i} &amp;= dw_i = \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial w_i} = x_i \frac{\partial \mathbb{L}}{\partial z_i}
+\end{aligned}
+&lt;/script&gt;
+
+&lt;h2 id=&quot;the-algorithm-for--m--examples&quot;&gt;The Algorithm for &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; examples&lt;/h2&gt;
+
+&lt;p&gt;I’ll lay out algorithm here, to iterate over &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; examples. The idea is to repeatedly iterate till the cost function &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; converges.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Initialize values:
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+J &amp;amp;= 0 \\
+w &amp;amp;= [0, 0, \ldots 0]_{1 \times n_x} \\
+b &amp;amp;= 0  
+\end{aligned}
+&lt;/script&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;mark&gt; Outer Loop&lt;/mark&gt;: For each example &lt;script type=&quot;math/tex&quot;&gt; i \in [1,2, \ldots m ]&lt;/script&gt;: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+z^{(i)} &amp;amp;= w^T x^{(i)} + b \\
+a^{(i)} &amp;amp;= \sigma(z^{(i)}) \\
+\mathbb{L}^{(i)} &amp;amp;= - \left( y^{(i)} \log a^{(i)} + (1 - y^{(i)}) \log (1 - a^{(i)}) \right) \\
+J = J + \mathbb{L}^{(i)}
+dz^{(i)} &amp;amp;= a^{(i)} - y^{(i)} \\
+\text{Set } dw &amp;amp;= [0, 0, \ldots 0]_{1 \times n_x}, db = 0 \\
+\end{aligned}
+&lt;/script&gt;
+ 2.1. &lt;mark&gt;Inner Loop&lt;/mark&gt;: For each element &lt;script type=&quot;math/tex&quot;&gt; k \in [1, 2, \ldots n_x] &lt;/script&gt; 
+ &lt;script type=&quot;math/tex; mode=display&quot;&gt;
+ \begin{aligned}
+ dw_k &amp;amp;= dw_k + x_k^{(i)} dz^{(i)} \\
+ db &amp;amp;= db + dz^{(i)}
+ \end{aligned}
+ &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Update (w,b) as:
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+w &amp;amp;= w + \displaystyle \frac{1}{m} dw \\
+b &amp;amp;= b + \displaystyle \frac{1}{m} db \\
+\end{aligned}
+&lt;/script&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Repeat steps 1, 2, and 3 till the value of &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; converges, i.e. it does not change with more iterations, or changes within a preset small value.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Some explanation of what’s going on here is probably required, so here it is:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;In the first step, we just initialize all the values to zero. Note the dimensions of the parameters. &lt;script type=&quot;math/tex&quot;&gt; J \in \mathbb{R}, w \in \mathbb{R}_{1 \times n_x}, b \in \mathbb{R} &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;We loop through the examples:
+    &lt;ul&gt;
+      &lt;li&gt;&lt;mark&gt;Forward propagation: &lt;/mark&gt;For each example, we calculate our predictions, and our loss function&lt;/li&gt;
+      &lt;li&gt;&lt;mark&gt;Backward propagation: &lt;/mark&gt;Then we loop through the individual feature vector for this example to find the contribution of this example to the weights. &lt;mark&gt;This is where information is transferred from the input feature vector to the output parameters&lt;/mark&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;We update our parameters&lt;/li&gt;
+  &lt;li&gt;Repeat till convergence.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I hope that’s clear. If not, or if you see something wrong here, leave a comment and I’ll update the post!&lt;/p&gt;
+
+&lt;h2 id=&quot;vectorization&quot;&gt;Vectorization&lt;/h2&gt;
+
+&lt;p&gt;In computation, and especially while dealing with large amounts of data, it’s not very efficient to have these nested for loops in the code. Fortunately, most of the operations in the optimization above are &lt;em&gt;vectorizable&lt;/em&gt;, i.e. they can be converted to matrix operations.&lt;/p&gt;
+
+&lt;p&gt;Why would we want to convert these operations to matrix operations? Well, mathematicians have spent hundreds of years working out cool things related to matrices that make them extremely friendly to fast computation. Computer Scientists have also spent a lot of time on making matrix operations efficient, though not hundreds of years, but only because computers haven’t existed that long.&lt;/p&gt;
+
+&lt;p&gt;Python is especially bad at nested loops. Since it’s an interpreted language, it can’t make any optimizations of its own and becomes super slow. So, we vectorize!&lt;/p&gt;
+
+&lt;p&gt;I’m not going into the derivations here again, because again, it’s just algebra, and this time, it’s not even that complicated. You just need to know a little bit about how matrices work.&lt;/p&gt;
+
+&lt;p&gt;But &lt;mark&gt;VERY IMPORTANTLY&lt;/mark&gt;, remember that the matrix rules below &lt;mark&gt;are what you are going to use in your code finally!&lt;/mark&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vectorized-logistic-regression&quot;&gt;Vectorized Logistic Regression&lt;/h3&gt;
+
+&lt;p&gt;The matrices and vectors involved are:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+X_{n_x \times m} &amp;= [x^{(1)}, x^{(2)}, \ldots, x^{(m)}] \\
+y_{1 \times m} &amp;= [y^{(1)}, y^{(2)}, \ldots, y^{(m)}] \\
+w_{m \times 1}^T &amp;= [w_1, w_2, \ldots, w_m] \\
+Z &amp;= [z^{(1)}, z^{(2)}, \ldots z^{(m)}] \\
+  &amp;= w^TX + [b, b, \ldots b]_{1 \times m}
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;With that, we can calculate:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+A &amp;= \sigma(Z) \\
+  &amp;= [a^{(1)}, a^{(2)}, \ldots, a^{(m)}] \\
+dZ &amp;= A - Y \\
+   &amp;= [(a^{(1)} - y^{(1)}), (a^{(2)} - y^{(2)}), \ldots, (a^{(m)} - y^{(m)})] \\
+dw &amp;= \displaystyle \frac{1}{m} \displaystyle \sum XdZ^T \\
+db &amp;= \displaystyle \frac{1}{m} \displaystyle \sum(dZ)
+\end{aligned}
+
+&lt;/script&gt;
+
+&lt;p&gt;These matrix operations will replace the inside of the for loop in the algorithm outlined above. We &lt;em&gt;can&lt;/em&gt; actually replace even the outer for loop, but that will involve some advanced mathematics we will get to later.&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;So, there we have it. After a long and winding road, we’ve gone through what it would take to do logistic regression using neural networks. Note that we &lt;em&gt;still have only one neuron&lt;/em&gt;!&lt;/p&gt;
+
+&lt;p&gt;Until next time, adios! Please feel free to leave comments below with questions, or complaints that I’ve been too vague or too wordy or too crazy.&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Welcome to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in Part 1 and then defined the optimization problem in Part 2. In this episode, we’ll first develop an algorithm to solve the problem by iterating through the examples, and then use the awesome power of vectorization to go through all examples at once. So, let’s get started, yeah?</summary></entry><entry><title type="html">Logistic Regression and Neural Networks - Part 2: Defining the Problem</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html" rel="alternate" type="text/html" title="Logistic Regression and Neural Networks - Part 2: Defining the Problem" /><published>2017-08-15T10:25:00+05:30</published><updated>2017-08-15T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html">&lt;p&gt;In the &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;previous post&lt;/a&gt;, I introduced the basic idea behind logistic regression and the notation for:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;One input&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt; x \in \mathbb{R}^{n_x} &lt;/script&gt;, a feature vector extracted from whatever our data source is, and &lt;script type=&quot;math/tex&quot;&gt; n_x &lt;/script&gt; is the number of features&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;One training label&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt; y \in {0,1}&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The weight and threshold&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt;(w \in \mathbb{R}^{n_x}, b \in \mathbb{R})&lt;/script&gt; are the weight vector and the threshold respectively&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The output&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt; \hat{y} = \sigma(w^Tx + b) &lt;/script&gt; where &lt;script type=&quot;math/tex&quot;&gt; \sigma &lt;/script&gt; represents the sigmoid function, and &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt; represents the &lt;em&gt;probability&lt;/em&gt; that &lt;script type=&quot;math/tex&quot;&gt; y &lt;/script&gt; is 1. For example, in an object recognition problem, &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt; would represent the probability that an object is in an image.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If you need to refresh your memory, or for some reason, you’re reading this before &lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;Part 1&lt;/a&gt;, this would be a great time to click that link and have it open side-by-side with this one!&lt;/p&gt;
+
+&lt;p&gt;Now, if you give a kid just one example of a cat, there’s no way he’ll be able to tell whether the next thing he sees is a cat or not. Or maybe he will? I don’t know. Kids are weird. But Machine Learning algorithms are not. They need many examples of cats to be able to tell the difference between a cat and a not-cat.&lt;/p&gt;
+
+&lt;p&gt;So say we &lt;em&gt;do&lt;/em&gt; have many examples, and of course, based on all our reading, we already know what Logistic Regression is. So how can we use LR to extract information from all these examples, so our final algorithm is like a kid that knows how to recognize cats (but doesn’t do much else)?&lt;/p&gt;
+
+&lt;p&gt;Let’s find out. But first, we need to play the notation game a bit more, because we need to extend the notations to allow for multiple examples. In the &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;coursera course&lt;/a&gt; that these notes are based on, Andrew Ng uses his own notation, that’s a bit different from what I learned in college and what many papers use. I think he’s hoping that his notation catches on, but I’m scared it’ll fall into the &lt;a href=&quot;https://xkcd.com/927/&quot;&gt;standards trap&lt;/a&gt;. Anyway, since I’m doing his course and you’re reading these notes written by me who’s doing this course, let’s stick to what he says.&lt;/p&gt;
+
+&lt;p&gt;Here we go!&lt;/p&gt;
+
+&lt;h2 class=&quot;no_toc&quot; id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#notation&quot; id=&quot;markdown-toc-notation&quot;&gt;Notation&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-big-picture&quot; id=&quot;markdown-toc-the-big-picture&quot;&gt;The Big Picture&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-loss-function-and-the-cost-function&quot; id=&quot;markdown-toc-the-loss-function-and-the-cost-function&quot;&gt;The Loss Function and The Cost Function&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#optimization&quot; id=&quot;markdown-toc-optimization&quot;&gt;Optimization&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-problem&quot; id=&quot;markdown-toc-the-problem&quot;&gt;The Problem&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#gradient-descent&quot; id=&quot;markdown-toc-gradient-descent&quot;&gt;Gradient Descent&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#to-be-continued&quot; id=&quot;markdown-toc-to-be-continued&quot;&gt;To Be Continued…&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;notation&quot;&gt;Notation&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Number of examples&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt; m \in \mathbb{R} &lt;/script&gt; will represent the number of examples, or images we have. Usually we just use &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt;, but in case we have a need to differentiate between the training set and the test set, we use:
+    &lt;ul&gt;
+      &lt;li&gt;The number of training examples is &lt;script type=&quot;math/tex&quot;&gt; m_{train} &lt;/script&gt;&lt;/li&gt;
+      &lt;li&gt;The number of test data is &lt;script type=&quot;math/tex&quot;&gt; m_{test} &lt;/script&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Training set&lt;/strong&gt;: The training set for &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; training examples is given by:
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\displaystyle \left[ (x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), \ldots, (x^{(i)}, y^{(i)}), \ldots (x^{(m)}, y^{(m)}) \right]
+&lt;/script&gt;
+where &lt;script type=&quot;math/tex&quot;&gt; (x^{(i)}, y^{(i)})&lt;/script&gt; represents the &lt;script type=&quot;math/tex&quot;&gt; i^{th} &lt;/script&gt; training example and its label.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Feature matrix&lt;/strong&gt;: The feature matrix is just the feature vectors for the individual examples placed, one after another, i.e. 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+X = \displaystyle \left[ x^{(1)}, x^{(2)}, \ldots, x^{(i)}, \ldots x^{(m)} \right]
+&lt;/script&gt;
+The shape (or in math language, the order) of &lt;script type=&quot;math/tex&quot;&gt; X &lt;/script&gt; is &lt;script type=&quot;math/tex&quot;&gt; (n_x, m) &lt;/script&gt;, i.e &lt;script type=&quot;math/tex&quot;&gt; n_x &lt;/script&gt; rows and &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; columns&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Label Matrix&lt;/strong&gt;: Similar to the feature matrix, the label matrix is given by:
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+Y = \displaystyle \left[ y^{(1)}, y^{(2)}, \ldots, y^{(i)}, \ldots y^{(m)} \right]
+&lt;/script&gt;
+The shape of &lt;script type=&quot;math/tex&quot;&gt; Y &lt;/script&gt; is just &lt;script type=&quot;math/tex&quot;&gt; (1, m) &lt;/script&gt; because each element is known to be either 0 or 1.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Phew. That’s a mouthful isn’t it? But you and I, we’re going to get used to this notation together. Now, onto the optimisation problem.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-big-picture&quot;&gt;The Big Picture&lt;/h2&gt;
+
+&lt;p&gt;Let’s take stock of what we have: we have &lt;script type=&quot;math/tex&quot;&gt; m &lt;/script&gt; examples, each of which is represented in a feature matrix &lt;script type=&quot;math/tex&quot;&gt; X_{n_x \times m} &lt;/script&gt;. The &lt;script type=&quot;math/tex&quot;&gt; i^{th} &lt;/script&gt; column in the matrix corresponds to the feature vector for the &lt;script type=&quot;math/tex&quot;&gt; i^{th} &lt;/script&gt; example.&lt;/p&gt;
+
+&lt;p&gt;Our goal at the end of all this is to predict the label for new feature vector. The way we do this is by training our algorithm to &lt;em&gt;learn&lt;/em&gt; based on all the information we have, i.e. the training examples.&lt;/p&gt;
+
+&lt;p&gt;Ideally, our algorithm would be perfect and learn everything perfectly. Of course, this is never the case because:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;All the information we need might not be in the training examples&lt;/li&gt;
+  &lt;li&gt;The way we collect information from the training examples might be incorrect or inefficient&lt;/li&gt;
+  &lt;li&gt;Have we forgotten this is the real world? Nothing is perfect here!&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In fact, it a rare thing to get perfect performance even on the training set!&lt;/p&gt;
+
+&lt;p&gt;What does this mean for us? Well, it means we need a way to measure the imperfections, i.e. the quantity of errors we make on our training set while predicting on the training set, i.e. 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+J = \displaystyle\sum_{i=1}^{m} \mathbb{L}(y_i- \hat{y_i})
+&lt;/script&gt;
+where &lt;script type=&quot;math/tex&quot;&gt; y_i &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; \hat{y_i} &lt;/script&gt;   are the actual and the predicted label respectively. The function &lt;script type=&quot;math/tex&quot;&gt; \mathbb{L} = \mathbb{L}: \mathbb{R} \rightarrow \mathbb{R} &lt;/script&gt; is called the &lt;strong&gt;Loss Function&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;The total error &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; is just the sum of the loss function over all the training examples. This total error is called the &lt;strong&gt;Cost Function&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-loss-function-and-the-cost-function&quot;&gt;The Loss Function and The Cost Function&lt;/h3&gt;
+
+&lt;p&gt;How do we choose the loss function. Here, I’ll go over this &lt;em&gt;very&lt;/em&gt; briefly. First of all, from the equation, you should see that the error is positive when there are more error. With that in mind, here are some ideas:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Set &lt;script type=&quot;math/tex&quot;&gt; \mathbb{} &lt;/script&gt; to 0 if the prediction is correct and 1 if it is wrong.&lt;/li&gt;
+  &lt;li&gt;Define &lt;script type=&quot;math/tex&quot;&gt; \mathbb{L} &lt;/script&gt; as the sum of the squared errors: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\mathbb{L}(y, \hat{y}) = \frac{1}{2} (y - \hat{y})^2
+&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;mark&gt;Our Choice for Neural Networks&lt;/mark&gt;: Define &lt;script type=&quot;math/tex&quot;&gt; f &lt;/script&gt; as this weird looking function called the Cross Entropy Loss: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\mathbb{L}(y, \hat{y}) =  -( y \log\hat{y} + (1-y) \log(1 - \hat{y} )
+&lt;/script&gt;
+The negative sign above is because the part inside the parantheses decreases with increasing &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt;, and we want it to increase. In the lectures in the coursera deep learning course, I recall Andrew Ng saying this is the logistic loss. That is incorrect. The logistic loss is an even more complex function, which we don’t use anyway, so I’m omitting it.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In general, a good loss function is continuous, differentiable, &lt;em&gt;always positive&lt;/em&gt;, deals with outliers (large deviations and errors), and works well with optimisation algorithms. For our case of Neural Networks, many engineers and scientists before us have chosen the third function above as the best option. So we do, too. It turns out this function works espcially works well with our optimisation algorithm of choice: Stochastic Gradient Descent (woo. Big words!)&lt;/p&gt;
+
+&lt;p&gt;So, there we have it: our complicated loss function. Using it, our cost function &lt;script type=&quot;math/tex&quot;&gt; J &lt;/script&gt; is simply given by: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+J = -\displaystyle\frac{1}{m} \displaystyle\sum_{i=1}^{m} \left(y_i \log\hat{y_i} + (1-y_i) \log(1 - \hat{y_i} \right)
+&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Now that we have our cost function, our next goal in life is to minimize it. What this means is that we are trying to get the combination of parameters that gives us &lt;em&gt;the least difference between our predicted values and the ground truth&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;We will do that by doing some awesome &lt;strong&gt;numerical optimization&lt;/strong&gt; (because it turns out there isn’t an easy theoretical solution to this problem above). Let’s get started!&lt;/p&gt;
+
+&lt;h2 id=&quot;optimization&quot;&gt;Optimization&lt;/h2&gt;
+
+&lt;p&gt;Before we proceed, here’s some new notation: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+a &amp;amp;= \hat{y} \\
+z &amp;amp;= w^Tx + b
+\end{aligned}
+&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;With that ready, let’s define our problem:&lt;/p&gt;
+
+&lt;h3 id=&quot;the-problem&quot;&gt;The Problem&lt;/h3&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+\text{Minimize } J(w, b) &amp;=  -\frac{1}{m} \displaystyle \sum_{i=1}^{m} \left(y_i \log a + (1-y_i) \log(1 - a \right) \\
+\text{where: } a(w, b) &amp;= \hat{y} = \sigma(w^Tx + b) = \sigma(z)
+\end{aligned}
+&lt;/script&gt;
+
+&lt;p&gt;For reasons I won’t get into here (at least not in this post), but are extremely interesting nonetheless, this problem cannot be solved analytically. But basically, you can see even by looking at it (with it’s sigmoid function and the logs running around the place) that it’s going to be huge pain taking an analytical path.&lt;/p&gt;
+
+&lt;p&gt;So, we go…numerical!&lt;/p&gt;
+
+&lt;h2 id=&quot;gradient-descent&quot;&gt;Gradient Descent&lt;/h2&gt;
+
+&lt;p&gt;Any numerical algorithm for optimisation follows this basic logic:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Assume a starting point&lt;/li&gt;
+  &lt;li&gt;Decide a direction to go in, based on some logic&lt;/li&gt;
+  &lt;li&gt;Take a step in that direction&lt;/li&gt;
+  &lt;li&gt;Repeat Steps 2 and 3 till you’ve converged. The logic of convergence is up to you.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;An algorithm &lt;em&gt;very&lt;/em&gt; commonly used for numerical optimisation problems is Gradient Descent. This algorithm has a very cool logic for taking steps that’s best explained with an analogy. If you’re walking down a hill towards a valley. There’s no path, and you don’t know which direction to go, and for some reason, you can’t see the valley. What do you do? Here’s your thoughts as I have thought them for you:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;As long as you’re walking down, you’re going towards the valley. That much is true. You might end up in an adjacent valley, but I guess that’s still better than staying on the hill? So conclusion: &lt;em&gt;Going down is good&lt;/em&gt;.&lt;/li&gt;
+  &lt;li&gt;But you can go straight down, you can go down at this angle, or that angle…how do you choose? On normal hills, you would choose a safe path. But since this hill is special, all paths are safe. So obviously, since we want to get to our valley fast, we will choose the angle that gives us &lt;em&gt;steepest&lt;/em&gt; path, so we check all the angles and take the one that takes the steepest down.&lt;/li&gt;
+  &lt;li&gt;We’re going down, down, down, making good progress on our steepest paths. How do we know when we’ve reached a valley? You got it! We know we’ve reached a valley when we’ve stopped going down, i.e. the hill has become flat. Or we start going up again!&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;It turns out (not by coincidence, but by math), that the steepest path down a function’s surface corresponds to the direction of its gradient. To put in terms of our four steps above, gradient descent involves:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Assume starting values for all parameters &lt;script type=&quot;math/tex&quot;&gt; (w, b) &lt;/script&gt; in our case&lt;/li&gt;
+  &lt;li&gt;Calculate the gradient: The gradient is given by &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial b} \displaystyle\right) &lt;/script&gt;. Note that the derivative &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \frac{ \partial J}{\partial w} &lt;/script&gt; is a vector with the same size as &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Update the parameters: 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+w &amp;amp;= w - \alpha \frac{ \partial J}{\partial w} \\
+b &amp;amp;= b - \alpha \frac{ \partial J}{\partial b}
+\end{aligned}
+&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Repeat till convergence, i.e till the values of &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; b &lt;/script&gt; don’t change much with new iterations&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;“Wait a minute. What’s that &lt;script type=&quot;math/tex&quot;&gt; \alpha &lt;/script&gt; there?”, one of you asks.&lt;/p&gt;
+
+&lt;p&gt;Sorry for jumping that on you, but that’s what happened in the lectures as well. &lt;script type=&quot;math/tex&quot;&gt; \alpha &lt;/script&gt; is the &lt;mark&gt;learning rate&lt;/mark&gt;. It turns out that gradient descent sometimes skips the minimum. Think of it as you’re going down a hill, but you’re a giant, and after you find the direction of steepest descent (you’re a giant with very good eyesight), you take a step, but you end up on the next hill! That’s why we use the learning rate.&lt;/p&gt;
+
+&lt;h2 id=&quot;to-be-continued&quot;&gt;To Be Continued…&lt;/h2&gt;
+
+&lt;p&gt;We’ve defined the algorithm, but this post is getting long, and the next part is also quite long: calculating the derivatives and actually going through and applying gradient descent fully to this problem. An example with only two features will be provided, and then we’ll extend it to the general case.&lt;/p&gt;
+
+&lt;p&gt;Also coming up in that post will be &lt;strong&gt;Vectorization&lt;/strong&gt;, aka trying to make even Python a decently fast language!&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">In the previous post, I introduced the basic idea behind logistic regression and the notation for:</summary></entry><entry><title type="html">Logistic Regression and Neural Networks - Part 1: The Medium Size Picture</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html" rel="alternate" type="text/html" title="Logistic Regression and Neural Networks - Part 1: The Medium Size Picture" /><published>2017-08-12T10:25:00+05:30</published><updated>2017-08-12T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html">&lt;p&gt;In this post, we will go over the basics of the functioning of a neural network. The idea will be to use Logistic Regression and Gradient Descent to illustrate the fundamentally important concepts of &lt;strong&gt;forward propagation&lt;/strong&gt; and &lt;strong&gt;backpropagation&lt;/strong&gt;. As an example, we might write some code for image recognition, which should give you an idea of just how powerful neural networks.&lt;/p&gt;
+
+&lt;p&gt;The post loosely follows (with some edits and additions by me) the lectures in Week 2 of the &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;Deep Learning Specialisation on coursera&lt;/a&gt;. The lectures in Week 2 covered a lot of ground (mostly because they glossed over a lot of cook stuff), so I’m splitting this tutorial into two parts.&lt;/p&gt;
+
+&lt;p&gt;In the first part, I’ll introduce the notation (always a pain) and Logistic Regression itself.&lt;/p&gt;
+
+&lt;p&gt;Throughout this tutorial, we’ll be using the &lt;mark&gt;cat-or-not problem&lt;/mark&gt; to illustrate the mathematical and algorithmic points made. The problem: given an image, the network should be trained to be able to say if there is a cat in it or not; i.e. a simple binary classification problem.&lt;/p&gt;
+
+&lt;h2 class=&quot;no_toc&quot; id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet&quot; id=&quot;markdown-toc-a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet&quot;&gt;A Brief Intro to Logistic Regression – only one input, no learning yet!&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#generating-features-and-labels-for-the-cat-or-not-problem&quot; id=&quot;markdown-toc-generating-features-and-labels-for-the-cat-or-not-problem&quot;&gt;Generating features and labels for the Cat-Or-Not problem&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#logistic-regression-as-a-neuron&quot; id=&quot;markdown-toc-logistic-regression-as-a-neuron&quot;&gt;Logistic Regression as a Neuron&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conclusion-of-part-1&quot; id=&quot;markdown-toc-conclusion-of-part-1&quot;&gt;Conclusion of Part 1&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#to-be-continued&quot; id=&quot;markdown-toc-to-be-continued&quot;&gt;To be continued…&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet&quot;&gt;A Brief Intro to Logistic Regression – only one input, no learning yet!&lt;/h2&gt;
+
+&lt;p&gt;Logistic Regression is an algorithm that was developed for binary classification. Let’s get with our cat problem to get comfortable with the ideas behind the algorithm, the notations used, and all that jazz. The parameters involved in Logistic Regression are:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;What it takes in:
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;Feature vectors&lt;/strong&gt;: &lt;em&gt;One&lt;/em&gt; feature vector is represented as &lt;script type=&quot;math/tex&quot;&gt; x \in \mathbb{R^{n_x}} &lt;/script&gt;, where &lt;script type=&quot;math/tex&quot;&gt; n_x &lt;/script&gt; is the number of features. In code, this would become an array of dimensions &lt;script type=&quot;math/tex&quot;&gt; (n_x, 1) &lt;/script&gt;.&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Training labels&lt;/strong&gt;: &lt;em&gt;One&lt;/em&gt; training label is represtend by &lt;script type=&quot;math/tex&quot;&gt; y \in {0, 1} &lt;/script&gt;. For example, in our cat-or-not game, &lt;script type=&quot;math/tex&quot;&gt; y = 1 &lt;/script&gt; would mean that a cat is in the image and &lt;script type=&quot;math/tex&quot;&gt; y = 0 &lt;/script&gt; would indicate that it is not&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;What it calculates:
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;The weights and the threshold&lt;/strong&gt;: &lt;script type=&quot;math/tex&quot;&gt; w \in \mathbb{R^{n_x}} &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; b \in \mathbb{R} &lt;/script&gt;. So &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt; is an array of dimensions &lt;script type=&quot;math/tex&quot;&gt; (n_x, 1) &lt;/script&gt; (same as &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;), while &lt;script type=&quot;math/tex&quot;&gt; b &lt;/script&gt; is just a real number&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;What it predicts: &lt;script type=&quot;math/tex&quot;&gt; \hat{y} = P( y = 1 | x)&lt;/script&gt;, i.e. the probability that &lt;script type=&quot;math/tex&quot;&gt; y &lt;/script&gt; is 1 given &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;generating-features-and-labels-for-the-cat-or-not-problem&quot;&gt;Generating features and labels for the Cat-Or-Not problem&lt;/h3&gt;
+
+&lt;p&gt;In the Cat-Or-Not problem, what we are given for training is a set of images, for each of which has been labelled as having a cat or not. We need to convert our image and our knowledge of whether it has a cat into actual values of &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; y &lt;/script&gt;. This is how we accomplish this in code:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;We read in the image using one of python’s packages (I recommend &lt;code class=&quot;highlighter-rouge&quot;&gt;ndimage&lt;/code&gt;), and we get an array with size &lt;script type=&quot;math/tex&quot;&gt; (r_x, r_y, 3) &lt;/script&gt; where &lt;script type=&quot;math/tex&quot;&gt; (r_x, r_y) &lt;/script&gt; is the resolution of the image (the number of pixels along the two axes) and the 3 values for each pixel represent the RGB color values that the image needs to decide the colour at that pixel. Since &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt; is a 1-D vector, we convert this 3-D matrix into a 1-d vector, by simply concatenating all of the values into one long vector of dimension &lt;script type=&quot;math/tex&quot;&gt; r_x \times r_y \times 3 &lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;The label &lt;script type=&quot;math/tex&quot;&gt; y = 0 &lt;/script&gt; if there isn’t a cat and &lt;script type=&quot;math/tex&quot;&gt; y = 1 &lt;/script&gt; if there is a cat. This part is not that complicated.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So now, for each of our images, we have a vector of dimenstion &lt;script type=&quot;math/tex&quot;&gt; (r_x \times r_y \times 3, 1) &lt;/script&gt;, and a value for &lt;script type=&quot;math/tex&quot;&gt; y &lt;/script&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;logistic-regression-as-a-neuron&quot;&gt;Logistic Regression as a Neuron&lt;/h3&gt;
+
+&lt;p&gt;The problem statement of LR is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\text{Given }x, \text{ get } \hat{y} = P( y = 1 | x )
+&lt;/script&gt;
+
+&lt;p&gt;In plain words for our cat-or-not game: given an image represented by the feature vector &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;, tell me the probability that there is a cat in it.&lt;/p&gt;
+
+&lt;p&gt;We have multiple (many!) images for which we know the “ground truth”, i.e. whether the image contains a cat. So we want to train our algorithm so that we best understand from these images what it means for an image to have a cat. Is that sort of clear? The goal of logistic regression is to &lt;strong&gt;minimize the error&lt;/strong&gt; between its predictions and the ground truth in the training data.&lt;/p&gt;
+
+&lt;p&gt;We start by defining the prediction &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt; as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\hat{y} = \sigma (w^Tx +b)
+\text{    where } \sigma(z) = \displaystyle \frac{1}{1 + e^{-z}}
+&lt;/script&gt;
+
+&lt;p&gt;“What the hell is that? Where did the &lt;script type=&quot;math/tex&quot;&gt; \sigma&lt;/script&gt; come from? What is it?”, one of you asks.&lt;/p&gt;
+
+&lt;p&gt;The idea behind the &lt;strong&gt;sigmoid&lt;/strong&gt; function is as follows: &lt;script type=&quot;math/tex&quot;&gt; w^Tx + b &lt;/script&gt; is a linear function of &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;, so that’s cool. But this linear function is unbounded, and since we want a probability we have to constrain it to the interval &lt;script type=&quot;math/tex&quot;&gt; [0, +1] &lt;/script&gt;. As you can see in the image below, the sigmoid is bounded between 0 and 1.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week2/sigmoid.png&quot; alt=&quot;The Sigmoid Function&quot; /&gt;
+&lt;em&gt;The sigmoid function. Notice how it is 0 for large negative values of &lt;script type=&quot;math/tex&quot;&gt; x &lt;/script&gt;, 1 for large positive values, and 0.5 when &lt;script type=&quot;math/tex&quot;&gt; x = 0 &lt;/script&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;So we have a nice measure for probability. It also helps that the sigmoid function is continuous and smooth everywhere, but that’s too much for this article.&lt;/p&gt;
+
+&lt;p&gt;Can you see the similarity to Neural Networks now? We have a linear transformation and an activation function being applied to an input: exactly like a neuron! Want a figure? Here you go!&lt;/p&gt;
+
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week2/lr_nn.jpg&quot; alt=&quot;Logistic Regression on One Training Example as a Neuron&quot; /&gt;
+&lt;em&gt;Logistic Regression on a single training example as a Neuron&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion-of-part-1&quot;&gt;Conclusion of Part 1&lt;/h2&gt;
+
+&lt;p&gt;The following facts are important to keep in mind:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Everything so far has been for a &lt;em&gt;single&lt;/em&gt; training example&lt;/li&gt;
+  &lt;li&gt;Our goal is to find &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt;. To find &lt;script type=&quot;math/tex&quot;&gt; \hat{y} &lt;/script&gt;, we have to calculate &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; b &lt;/script&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We don’t seem any closer to this than we started, I know. But this post was just to set up the problem and notation.&lt;/p&gt;
+
+&lt;p&gt;&lt;mark&gt;Very important thing&lt;/mark&gt;: We are trying to minimize the error between our predictions and the ground truth. Put another way, we are trying to &lt;em&gt;extract as much relevant information&lt;/em&gt; as possible from the training examples, so that the predictions that our Logistic Regression algorithm makes are sensible. I’ve always found it very useful to think in terms of extracting information from the training examples, and this is a point I’ll keep returning to as we go on with this tutorial series&lt;/p&gt;
+
+&lt;h2 id=&quot;to-be-continued&quot;&gt;To be continued…&lt;/h2&gt;
+
+&lt;p&gt;In the next part, we’ll explore:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;How we connect all the training examples through an iterative process in order to EXTRACT ALL THE INFORMATION! As you can see, I’m pretty excited about it&lt;/li&gt;
+  &lt;li&gt;How we define the deviation between our predictions and the ground truth (the error)&lt;/li&gt;
+  &lt;li&gt;How we minimize it&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;It turns out none of this is easy, but all of it is supremely fascinating.&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">In this post, we will go over the basics of the functioning of a neural network. The idea will be to use Logistic Regression and Gradient Descent to illustrate the fundamentally important concepts of forward propagation and backpropagation. As an example, we might write some code for image recognition, which should give you an idea of just how powerful neural networks.</summary></entry><entry><title type="html">Introduction to Deep Learning</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/11/week-1-intro-to-nn.html" rel="alternate" type="text/html" title="Introduction to Deep Learning" /><published>2017-08-11T10:25:00+05:30</published><updated>2017-08-11T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/11/week-1-intro-to-nn</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/11/week-1-intro-to-nn.html">&lt;h2 class=&quot;no_toc&quot; id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#overview&quot; id=&quot;markdown-toc-overview&quot;&gt;Overview&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#what-is-a-neuron&quot; id=&quot;markdown-toc-what-is-a-neuron&quot;&gt;What is a Neuron?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#neural-networks&quot; id=&quot;markdown-toc-neural-networks&quot;&gt;Neural Networks&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#applications-and-types-of-neural-networks&quot; id=&quot;markdown-toc-applications-and-types-of-neural-networks&quot;&gt;Applications and Types of Neural Networks&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#deep-learning-and-why-its-suddenly-so-popular&quot; id=&quot;markdown-toc-deep-learning-and-why-its-suddenly-so-popular&quot;&gt;Deep Learning and Why It’s Suddenly So Popular&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conclusion&quot; id=&quot;markdown-toc-conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;/h2&gt;
+
+&lt;p&gt;Technically, &lt;a href=&quot;https://en.wikipedia.org/wiki/Deep_learning&quot;&gt;Deep Learning&lt;/a&gt; is the application of Neural Networks where more than one hidden layer of neurons is involved. In the common form that it has pervaded the media today, it also usually involves a mixture of neural networks with other algorithms specifically applied to large datasets in a variety of areas.&lt;/p&gt;
+
+&lt;p&gt;Don’t know what that means? You’re in the right place! The idea of this post is to cover just enough ground (in a very shallow way, pun sort-of intended) so that you can say the above paragraph out loud and understand what it means. So the following questions that I’m sure are burning your stomach will be answered:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;What is a neuron?&lt;/li&gt;
+  &lt;li&gt;What is a neural network?&lt;/li&gt;
+  &lt;li&gt;What is deep learning?&lt;/li&gt;
+  &lt;li&gt;Why has it taken off in the last decade or so?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This post corresponds roughly to Week 1 in the &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;Coursera Deep Learning Specialisation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So, let’s get started!&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-a-neuron&quot;&gt;What is a Neuron?&lt;/h2&gt;
+
+&lt;p&gt;In the not-Computer-Science world a neuron is an organic thing in your body that is the basic unit of the nervous system. Any information that travels to your brain – heartbreak for example – goes through neurons. The way I understand it (it is important to note here that I am not a biologist), a neuron turns “on” at some level of electrical voltage. A pulse is carried through the neurons to the brain when they are all “on”. That’s how information – the feeling you get when you resolve a bug in your code, for example – gets to your brain.&lt;/p&gt;
+
+&lt;p&gt;In the Computer Science world, it’s the same, really. A neuron takes an input, applies a mathemtical transformation to it, and then gives an output.&lt;/p&gt;
+
+&lt;p&gt;“Wait, isn’t that the same as a mathematical function?”, one of you asks.&lt;/p&gt;
+
+&lt;p&gt;Nope, nope. A neuron actually does two things to achieve its transformation:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;It applies a dot product to the inputs with the weights (the weights are a property of the neuron) and adds a threshold. For example, if the input vectors are of type &lt;script type=&quot;math/tex&quot;&gt; \vec{x} \in \mathbb{R}_{3 \times 1}  &lt;/script&gt;, the weights will be of the form &lt;script type=&quot;math/tex&quot;&gt; \vec{w} \in \mathbb{R}_{3 \times 1} &lt;/script&gt;, and the output of this step will be &lt;script type=&quot;math/tex&quot;&gt; \vec{x} . \vec{w} + b &lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;Applies an activation function to the result of 1 above, i.e &lt;script type=&quot;math/tex&quot;&gt; f(\vec{x}.\vec{w} + b) &lt;/script&gt; where &lt;script type=&quot;math/tex&quot;&gt; f &lt;/script&gt; is a function chosen by us.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Here is a carefully constructed illutration that shows the in-depth workings of a single neuron as it is commonly represented in Computer Science.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week1/nn_basic.jpg&quot; alt=&quot;A not-so-helpful illustration of a neuron&quot; /&gt;
+&lt;em&gt;This illustration doesn’t illustrate much other than my inexperience with drawing software&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;“Okay fine. The function that the neuron applies can be any linear function, right? What is the class of activation function that you can use?”, someone pipes in from the back.&lt;/p&gt;
+
+&lt;p&gt;That’s actually a very good question, thank you!&lt;/p&gt;
+
+&lt;p&gt;When neural networks were first being designed and used, the &lt;a href=&quot;https://en.wikipedia.org/wiki/Sigmoid_function&quot;&gt;sigmoid&lt;/a&gt; function was pretty popular. The idea of a sigmoid function is to kinda-sorta simulate the behaviour of a switch (Y = 0 when X is negative and Y = 1 when X is positive), but with the property that is continuous and differentiable everywhere. So if the output of our linear function is positive, you get a value close to 1, and if it’s negative, you get a value of 0. Can you see how that will be useful if you are doing a classification problem where you either have to say “Yes” (1) or “No” (0)?&lt;/p&gt;
+
+&lt;p&gt;These days however, the RELU (REctified Linear Unit) is much more popular (shown in the ugly figure below). Apparently, it works much better with optimization algorithms such as Gradient Descent 🤷‍, even though there is that obvious discontinuity in the derivative. Maybe we’ll figure out how this works some day in the future, you and me.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week1/relu.jpg&quot; alt=&quot;REctified Linear Unit&quot; /&gt;
+&lt;em&gt;They could have just called it the RLU instead of RELU. Why the silly acronym?&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;So, to summarise, neuron takes input X, applies the RELU function to it, and generates Y as the output, which can either zero or positive. All clear? Good!&lt;/p&gt;
+
+&lt;h2 id=&quot;neural-networks&quot;&gt;Neural Networks&lt;/h2&gt;
+
+&lt;p&gt;I’m sure many of you saw this coming, but guess what neural networks are? They’re networks of neurons!&lt;/p&gt;
+
+&lt;p&gt;Neurons can be stacked together in a variety of ways, some of which are mind-bogglingly complex, but thankfully we don’t have to think about that yet. Right now, imagine them stacked in layers, each layer feeding into the one ahead of it. Here’s a figure for ya if my words aren’t that well chosen.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week1/nn_with_layers.jpg&quot; alt=&quot;A feedforward neural network&quot; /&gt;
+&lt;em&gt;A feedforward neural network. Note that the figure is incomplete. Each neuron can link to ALL neurons in the next layer&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;So here’s what happens when you have the input vector:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Each neuron in each layer has a set of weights. X is fed into the first layer. Each individual neuron outputs the thresholded dot product, to which RELU is applied.&lt;/li&gt;
+  &lt;li&gt;The output of all those neurons are fed to the next layer.&lt;/li&gt;
+  &lt;li&gt;This is repeated till suddenly, you have your output value Y.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;There’s some handwaving there, I admit, because this stuff is still simmering in the pot of understanding of my mind. I’ll update this post with more clearly chosen words over the next few weeks.&lt;/p&gt;
+
+&lt;p&gt;I know at least some of you are looking at that figure and thinking: How do you know how many layers to use? What do the layers mean? How do we decide the individual functions? Wait, what’s happening?&lt;/p&gt;
+
+&lt;p&gt;So, here’s what &lt;em&gt;we&lt;/em&gt; decide:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The number of layers between the input and output&lt;/li&gt;
+  &lt;li&gt;The number of neurons in each layer&lt;/li&gt;
+  &lt;li&gt;The function that each neuron applies. By “decide” here, I mean that each neuron is an RELU. You don’t get to choose that for the most part!&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;mark&gt;A cool thing&lt;/mark&gt;: The algorithm figures out everything else! Everything else, of course, involves the weights on the individual neuron. The middle layers are sometimes called “hidden”, because all you care about are X and Y, and the algorithm figures out everything in between&lt;/p&gt;
+
+&lt;p&gt;&lt;mark&gt;Another cool thing&lt;/mark&gt;: Does that figure look like your brain? I know it doesn’t look like mine. It took a genius to make this connection: Walter Pitts. He spent most of his time chasing this idea of modeling the brain based on neural networks and unfortunately is not alive today to see the results of his work. You can read an excellent article about him and his amazing and sad life &lt;a href=&quot;http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;applications-and-types-of-neural-networks&quot;&gt;Applications and Types of Neural Networks&lt;/h3&gt;
+
+&lt;p&gt;Neural networks are used everywhere these days: from product recommendations to user-click probabilities, from image recognition to self driving cars. There are different types of neural networks, each of which we will get to at different points during this tutorial series:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Standard Neural Nets: Like the ones shown in that awesomely drawn figure above&lt;/li&gt;
+  &lt;li&gt;Convolutional Neural Nets: Each layer becomes multi-dimensional. Not sure what that means? To be honest, neither am I. We’ll figure it out in a future post. For now, know that CNNs are all the rage in image processing these days&lt;/li&gt;
+  &lt;li&gt;Recurrent Neural Networks: wWere we make use of sequential patterns in the data, like in natural language. So this is used in speech recognition, language processing, and those kinds of things&lt;/li&gt;
+  &lt;li&gt;Custom/Hybrid: Where you have different techniques, you can mix-and-match. Custom NNs are used in complex applications such as self driving cars.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;mark&gt;Important thing&lt;/mark&gt;: These days, all the publicity with deep learning is going to cool-sounding things like Image Processing (“Is that a bird? Is it a plane? No, it’s Superman!”), speech recognition (“The rain in spain falls mainly in the plain”), and their ilk. The commonality between these problems is that the data that the algorithms use are &lt;strong&gt;unstructured&lt;/strong&gt;. The reason they are so popular is that our brain also seems to think in an unstructured form (I know mine does!) and so maybe we can relate better to these problems.&lt;/p&gt;
+
+&lt;p&gt;However, great economic value has been obtained by applying NNs to &lt;strong&gt;structured&lt;/strong&gt; data as well. One of the areas that has received the greatest bump in awesomeness because of Deep Learning, for example, is Ad Pricing. You know how when you search for an product on Google, suddenly Facebook is showing you ads for the product. Well, someone is choosing to bid to show that ad to you at that moment, and they’re basing their decision on many computers running many iterations of Neural Networks on all the data they have on you!&lt;/p&gt;
+
+&lt;h2 id=&quot;deep-learning-and-why-its-suddenly-so-popular&quot;&gt;Deep Learning and Why It’s Suddenly So Popular&lt;/h2&gt;
+
+&lt;p&gt;Deep Learning is just the application of Large Neural Networks to problems with large amounts of data.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://pritamps.github.io/assets/dl_week1/data_vs_performance.jpg&quot; alt=&quot;Performance of Machine Learning Algorithms&quot; /&gt;
+&lt;em&gt;Performance of Machine Learning Algorithms versus the amount of data available&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;If you stare at the figure above long enough, you’ll see what’s going on. Deep Learning is in top right of that graph.&lt;/p&gt;
+
+&lt;p&gt;It turns out that the performance of standard machine learning algorithms doesn’t improve much if you give them more data. It’s almost like they’ve reached the limit of their “intelligence” and giving them more information just doesn’t help. So, we turn to neural networks, and keep adding more and more neurons and layers to it and we notice that the performance keeps improving.&lt;/p&gt;
+
+&lt;p&gt;Awesome! Let’s just use the biggest neural network with the largest amount of data.&lt;/p&gt;
+
+&lt;p&gt;Do you see where this is going:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Bigger Neural Networks&lt;/strong&gt; means more computing power is needed. Such power was not available till the last decade. Now we have supercomputers and all of Google’s might, so we have a fighting chance! These days, Google and NVidia and Intel (?) and AMD (?) are all designing chips specifically with Deep Learning in mind.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Large amount of data&lt;/strong&gt;: till the advent of the internet, data was siloed and in small amounts. Now with the internet and people writing unnecessary and wordy deep learning tutorials and other people taking needless smartphones photos, there is a deluge of data just waiting to be mined for information.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Until the last few years, it was just these two factors that was causing the growth in deep learning performance. But now, we have a new entrant to the arena:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Human Creativity!!&lt;/strong&gt; Yup, that’s right. Deep Learning algorithms won’t take your job if you’re making the algorithms. It turns out that a simple modification in the algorithms has a &lt;em&gt;huge&lt;/em&gt; effect on the performance of Neural Networks. For example, one of the most significant bumps in performance was obtained when the Neural Network funciton was switched from the sigmoid to the RELU.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;As I said in the beginning: &lt;em&gt;Deep Learning is the application of Neural Networks where more than one hidden layer of neurons is involved. In the common form that it has pervaded the media today, it also usually involves a mixture of neural networks with other algorithms specifically applied to large datasets in a variety of areas.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Now you know what all of that means. &lt;em&gt;Mic drop&lt;/em&gt;&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Table of Contents</summary></entry><entry><title type="html">Deep Learning Tutorials - Start here!</title><link href="https://pritamps.github.io/introduction/deeplearning/2017/08/10/deep-learning-1.html" rel="alternate" type="text/html" title="Deep Learning Tutorials - Start here!" /><published>2017-08-10T10:25:00+05:30</published><updated>2017-08-10T10:25:00+05:30</updated><id>https://pritamps.github.io/introduction/deeplearning/2017/08/10/deep-learning-1</id><content type="html" xml:base="https://pritamps.github.io/introduction/deeplearning/2017/08/10/deep-learning-1.html">&lt;p&gt;Welcome to my Deep Learning Tutorial Series!&lt;/p&gt;
+
+&lt;p&gt;Here are the posts in order so you can find them all from the same landing page:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;/deeplearning/neuralnetworks/2017/08/11/week-1-intro-to-nn.html&quot;&gt;Introduction to Deep Learning&lt;/a&gt;: A bird’s eye of what deep learning is why it’s become so popular these days&lt;/li&gt;
+  &lt;li&gt;Logistic Regression and Neural Networks: An exploration of the idea behind Neural Networks (actually, just one neuron for this part) using a Logistic Regression, a a popular Machine Learning Algorithm.
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html&quot;&gt;Part 1: The Medium-Size Picture&lt;/a&gt;: An introduction to the notation we will be using through this tutorial series, and talk a bit about logistic regression and how it relates to neural networks&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/2017/08/15/week-2-part-2-lr-gradient-descent-and-neural-networks.html&quot;&gt;Part 2: Defining the Problem&lt;/a&gt;: Even more notation, an attempt to explain why we need optimization, a bit about the idea behind gradient descent, and finally the definition of the optimization problem.&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;/deeplearning/neuralnetworks/logisticregression/optimization/2017/08/19/week-2-part-3-optimise.html&quot;&gt;Part 3: Optimization with Forward and Back Propagation&lt;/a&gt;: A simple example illustrating gradient descent, the idea behind forward and back propagation, the vectorized formulation of the optimization problem.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html&quot;&gt;Shallow Neural Networks&lt;/a&gt;: An exploration of neural networks with only one, or maybe just a few more, layers. This post will be useful to understand how neural networks work “under the hood” (or rather, as far under the hood as we can see) and just as importantly, how they are represented.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The idea to do this series came after I registered for the new &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;Deep Learning specialisation&lt;/a&gt; on Coursera. It’s taught by Andrew Ng, one of the most well-known names in Machine Learning.&lt;/p&gt;
+
+&lt;p&gt;This tutorial series is serving multiple purposes:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;I understand better the material that is being taught&lt;/li&gt;
+  &lt;li&gt;I have written notes for the specialisation&lt;/li&gt;
+  &lt;li&gt;Maybe these notes will help someone else&lt;/li&gt;
+  &lt;li&gt;I learn to draw Affinity Designer. It’s what I’ll be using to make the illustrations you see in the coming posts.&lt;/li&gt;
+  &lt;li&gt;I learn to use the Jekll blogging platform, because why not?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I intend to use this post as a landing page for the tutorial series. I’ll link to the individual posts from here.&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Welcome to my Deep Learning Tutorial Series!</summary></entry><entry><title type="html">Welcome to My Technical Blog!</title><link href="https://pritamps.github.io/introduction/update/2017/08/09/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to My Technical Blog!" /><published>2017-08-09T09:55:42+05:30</published><updated>2017-08-09T09:55:42+05:30</updated><id>https://pritamps.github.io/introduction/update/2017/08/09/welcome-to-jekyll</id><content type="html" xml:base="https://pritamps.github.io/introduction/update/2017/08/09/welcome-to-jekyll.html">&lt;p&gt;Hi! I’m Pritam Sukumar, a freelance Software Engineer travelling around in India while working on pet projects and being a project reviewer for the Udacity Artificial Intelligence Nanodegree.&lt;/p&gt;
+
+&lt;p&gt;I’ve been programming since I was a kid, starting with learning C by myself (anyone use &lt;em&gt;Let us C&lt;/em&gt; by Yashwant Kanetkar? One of the clearest books I’ve ever read) when I was 14, moving onto C++, then taking a diversion into MATLAB for my graduate work in Aerospace Engineering, and then jumping into Java and Android.&lt;/p&gt;
+
+&lt;p&gt;I want to use this space to keep notes on what I’m learning, and also maybe write tutorials once in a while if I can find the enthusiasm and put in the time. Right now, I’m learning:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Deep Learning from Andrew Ng’s &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;Deep Learning &lt;/a&gt; course on Coursera&lt;/li&gt;
+  &lt;li&gt;iOS from the &lt;a href=&quot;https://itunes.apple.com/us/course/developing-ios-10-apps-with-swift/id1198467120&quot;&gt;Stanford CS193p course&lt;/a&gt; on iTunes&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So hopefully you’ll see tutorials on all those things. Good luck!&lt;/p&gt;
+
+&lt;p&gt;Cheers,
+Pritam&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Hi! I’m Pritam Sukumar, a freelance Software Engineer travelling around in India while working on pet projects and being a project reviewer for the Udacity Artificial Intelligence Nanodegree.</summary></entry></feed>

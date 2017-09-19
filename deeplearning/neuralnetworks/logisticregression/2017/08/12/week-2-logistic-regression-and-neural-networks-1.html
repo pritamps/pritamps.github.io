@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+   <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Logistic Regression and Neural Networks - Part 1: The Medium Size Picture</title>
+  <meta name="description" content="In this post, we will go over the basics of the functioning of a neural network. The idea will be to use Logistic Regression and Gradient Descent to illustra...">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://pritamps.github.io/deeplearning/neuralnetworks/logisticregression/2017/08/12/week-2-logistic-regression-and-neural-networks-1.html">
+  <link rel="alternate" type="application/rss+xml" title="Programming Blog" href="/feed.xml">
+  
+  <!-- Google Fonts - Inconsolata -->
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700" rel="stylesheet">
+  
+
+  <!-- Load jQuery -->
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+  <!-- Load KaTeX -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.1/katex.min.css" integrity="sha384-BDqcjN11/6D69oC63ObubLHNvQR2fNjin6+AzxA3xalB0swTj17TxVV1tL1Q5Png" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.1/katex.min.js" integrity="sha384-sKYm5us3z9/bRQA+cc3gPzqwI5RVgL8vJQx1lpBudr9IzHOR8fnFUH68dz1GsTQw" crossorigin="anonymous"></script>
+</head>
+
+
+
+  <body>
+  <div class="container">
+    <header>
+      <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+    <a class="site-title" href="/">Programming Blog</a>
+  
+    
+      <nav class="site-nav">
+        <div class="trigger">
+          
+            
+            
+          
+            
+            
+            <a class="page-link" href="/about/">About Me</a>
+            
+          
+            
+            
+          
+            
+            
+          
+            
+            
+            <a class="page-link" href="/jekyllbuild_files/">jekyllbuild_files</a>
+            
+          
+            
+            
+          
+        </div>
+        <div>
+          <a class="page-link" href="/">Home</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+    </header>
+  
+    <main>
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Logistic Regression and Neural Networks - Part 1: The Medium Size Picture</h1>
+  </header>
+
+  <div class="post-info">
+      
+    <span class="post-meta">Aug 12, 2017</span>
+    <span class="post-categories">Categories: deeplearning, neuralnetworks, logisticregression</span>
+  </div>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In this post, we will go over the basics of the functioning of a neural network. The idea will be to use Logistic Regression and Gradient Descent to illustrate the fundamentally important concepts of <strong>forward propagation</strong> and <strong>backpropagation</strong>. As an example, we might write some code for image recognition, which should give you an idea of just how powerful neural networks.</p>
+
+<p>The post loosely follows (with some edits and additions by me) the lectures in Week 2 of the <a href="https://www.coursera.org/specializations/deep-learning">Deep Learning Specialisation on coursera</a>. The lectures in Week 2 covered a lot of ground (mostly because they glossed over a lot of cook stuff), so I’m splitting this tutorial into two parts.</p>
+
+<p>In the first part, I’ll introduce the notation (always a pain) and Logistic Regression itself.</p>
+
+<p>Throughout this tutorial, we’ll be using the <mark>cat-or-not problem</mark> to illustrate the mathematical and algorithmic points made. The problem: given an image, the network should be trained to be able to say if there is a cat in it or not; i.e. a simple binary classification problem.</p>
+
+<h2 class="no_toc" id="table-of-contents">Table of Contents</h2>
+<ul id="markdown-toc">
+  <li><a href="#a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet" id="markdown-toc-a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet">A Brief Intro to Logistic Regression – only one input, no learning yet!</a>    <ul>
+      <li><a href="#generating-features-and-labels-for-the-cat-or-not-problem" id="markdown-toc-generating-features-and-labels-for-the-cat-or-not-problem">Generating features and labels for the Cat-Or-Not problem</a></li>
+      <li><a href="#logistic-regression-as-a-neuron" id="markdown-toc-logistic-regression-as-a-neuron">Logistic Regression as a Neuron</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion-of-part-1" id="markdown-toc-conclusion-of-part-1">Conclusion of Part 1</a></li>
+  <li><a href="#to-be-continued" id="markdown-toc-to-be-continued">To be continued…</a></li>
+</ul>
+
+<h2 id="a-brief-intro-to-logistic-regression--only-one-input-no-learning-yet">A Brief Intro to Logistic Regression – only one input, no learning yet!</h2>
+
+<p>Logistic Regression is an algorithm that was developed for binary classification. Let’s get with our cat problem to get comfortable with the ideas behind the algorithm, the notations used, and all that jazz. The parameters involved in Logistic Regression are:</p>
+
+<ul>
+  <li>What it takes in:
+    <ul>
+      <li><strong>Feature vectors</strong>: <em>One</em> feature vector is represented as <script type="math/tex"> x \in \mathbb{R^{n_x}} </script>, where <script type="math/tex"> n_x </script> is the number of features. In code, this would become an array of dimensions <script type="math/tex"> (n_x, 1) </script>.</li>
+      <li><strong>Training labels</strong>: <em>One</em> training label is represtend by <script type="math/tex"> y \in {0, 1} </script>. For example, in our cat-or-not game, <script type="math/tex"> y = 1 </script> would mean that a cat is in the image and <script type="math/tex"> y = 0 </script> would indicate that it is not</li>
+    </ul>
+  </li>
+  <li>What it calculates:
+    <ul>
+      <li><strong>The weights and the threshold</strong>: <script type="math/tex"> w \in \mathbb{R^{n_x}} </script> and <script type="math/tex"> b \in \mathbb{R} </script>. So <script type="math/tex"> w </script> is an array of dimensions <script type="math/tex"> (n_x, 1) </script> (same as <script type="math/tex"> x </script>), while <script type="math/tex"> b </script> is just a real number</li>
+    </ul>
+  </li>
+  <li>What it predicts: <script type="math/tex"> \hat{y} = P( y = 1 | x)</script>, i.e. the probability that <script type="math/tex"> y </script> is 1 given <script type="math/tex"> x </script>.</li>
+</ul>
+
+<h3 id="generating-features-and-labels-for-the-cat-or-not-problem">Generating features and labels for the Cat-Or-Not problem</h3>
+
+<p>In the Cat-Or-Not problem, what we are given for training is a set of images, for each of which has been labelled as having a cat or not. We need to convert our image and our knowledge of whether it has a cat into actual values of <script type="math/tex"> x </script> and <script type="math/tex"> y </script>. This is how we accomplish this in code:</p>
+
+<ol>
+  <li>We read in the image using one of python’s packages (I recommend <code class="highlighter-rouge">ndimage</code>), and we get an array with size <script type="math/tex"> (r_x, r_y, 3) </script> where <script type="math/tex"> (r_x, r_y) </script> is the resolution of the image (the number of pixels along the two axes) and the 3 values for each pixel represent the RGB color values that the image needs to decide the colour at that pixel. Since <script type="math/tex"> x </script> is a 1-D vector, we convert this 3-D matrix into a 1-d vector, by simply concatenating all of the values into one long vector of dimension <script type="math/tex"> r_x \times r_y \times 3 </script>.</li>
+  <li>The label <script type="math/tex"> y = 0 </script> if there isn’t a cat and <script type="math/tex"> y = 1 </script> if there is a cat. This part is not that complicated.</li>
+</ol>
+
+<p>So now, for each of our images, we have a vector of dimenstion <script type="math/tex"> (r_x \times r_y \times 3, 1) </script>, and a value for <script type="math/tex"> y </script>.</p>
+
+<h3 id="logistic-regression-as-a-neuron">Logistic Regression as a Neuron</h3>
+
+<p>The problem statement of LR is:</p>
+
+<script type="math/tex; mode=display">
+\text{Given }x, \text{ get } \hat{y} = P( y = 1 | x )
+</script>
+
+<p>In plain words for our cat-or-not game: given an image represented by the feature vector <script type="math/tex"> x </script>, tell me the probability that there is a cat in it.</p>
+
+<p>We have multiple (many!) images for which we know the “ground truth”, i.e. whether the image contains a cat. So we want to train our algorithm so that we best understand from these images what it means for an image to have a cat. Is that sort of clear? The goal of logistic regression is to <strong>minimize the error</strong> between its predictions and the ground truth in the training data.</p>
+
+<p>We start by defining the prediction <script type="math/tex"> \hat{y} </script> as follows:</p>
+
+<script type="math/tex; mode=display">
+\hat{y} = \sigma (w^Tx +b)
+\text{    where } \sigma(z) = \displaystyle \frac{1}{1 + e^{-z}}
+</script>
+
+<p>“What the hell is that? Where did the <script type="math/tex"> \sigma</script> come from? What is it?”, one of you asks.</p>
+
+<p>The idea behind the <strong>sigmoid</strong> function is as follows: <script type="math/tex"> w^Tx + b </script> is a linear function of <script type="math/tex"> x </script>, so that’s cool. But this linear function is unbounded, and since we want a probability we have to constrain it to the interval <script type="math/tex"> [0, +1] </script>. As you can see in the image below, the sigmoid is bounded between 0 and 1.</p>
+
+<p><img src="https://pritamps.github.io/assets/dl_week2/sigmoid.png" alt="The Sigmoid Function" />
+<em>The sigmoid function. Notice how it is 0 for large negative values of <script type="math/tex"> x </script>, 1 for large positive values, and 0.5 when <script type="math/tex"> x = 0 </script></em></p>
+
+<p>So we have a nice measure for probability. It also helps that the sigmoid function is continuous and smooth everywhere, but that’s too much for this article.</p>
+
+<p>Can you see the similarity to Neural Networks now? We have a linear transformation and an activation function being applied to an input: exactly like a neuron! Want a figure? Here you go!</p>
+
+<p style="text-align: center;"><img src="https://pritamps.github.io/assets/dl_week2/lr_nn.jpg" alt="Logistic Regression on One Training Example as a Neuron" />
+<em>Logistic Regression on a single training example as a Neuron</em></p>
+
+<h2 id="conclusion-of-part-1">Conclusion of Part 1</h2>
+
+<p>The following facts are important to keep in mind:</p>
+
+<ol>
+  <li>Everything so far has been for a <em>single</em> training example</li>
+  <li>Our goal is to find <script type="math/tex"> \hat{y} </script>. To find <script type="math/tex"> \hat{y} </script>, we have to calculate <script type="math/tex"> w </script> and <script type="math/tex"> b </script>.</li>
+</ol>
+
+<p>We don’t seem any closer to this than we started, I know. But this post was just to set up the problem and notation.</p>
+
+<p><mark>Very important thing</mark>: We are trying to minimize the error between our predictions and the ground truth. Put another way, we are trying to <em>extract as much relevant information</em> as possible from the training examples, so that the predictions that our Logistic Regression algorithm makes are sensible. I’ve always found it very useful to think in terms of extracting information from the training examples, and this is a point I’ll keep returning to as we go on with this tutorial series</p>
+
+<h2 id="to-be-continued">To be continued…</h2>
+
+<p>In the next part, we’ll explore:</p>
+
+<ol>
+  <li>How we connect all the training examples through an iterative process in order to EXTRACT ALL THE INFORMATION! As you can see, I’m pretty excited about it</li>
+  <li>How we define the deviation between our predictions and the ground truth (the error)</li>
+  <li>How we minimize it</li>
+</ol>
+
+<p>It turns out none of this is easy, but all of it is supremely fascinating.</p>
+
+
+  </div>
+  
+  
+
+
+
+  <script type="text/javascript">
+    
+$("script[type='math/tex']").replaceWith(
+  function(){
+    var tex = $(this).text();
+    return "<span class=\"inline-equation\">" + 
+           katex.renderToString(tex.replace("&","")) +
+           "</span>";
+});
+
+$("script[type='math/tex; mode=display']").replaceWith(
+  function(){
+    var tex = $(this).text();
+
+    // Need to do this replace here because Javascript 
+    // doesn't treat the `&` properly, and the `&` is needed
+    // for alignment
+    tex = tex.replace(/&amp;/gi, "\u0026")
+    return "<div class=\"equation\" align=\"center\">" + 
+           katex.renderToString(tex) +
+           "</div> <p></p>";
+});
+
+  </script>
+
+
+</article>
+
+    </main>
+  
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Programming Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="contact_info">
+        <ul class="contact-list">
+          <li>
+            
+              Pritam Sukumar
+            
+            </li>
+            
+            <li><a href="mailto:pritamps@gmail.com">pritamps@gmail.com</a></li>
+            
+        </ul>
+      </div>
+
+      <div class="social_media">
+        <ul class="social_media_list">
+          
+          <li>
+            <a href="https://github.com/pritamps"><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">pritamps</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/pritamps"><span class="icon icon--twitter"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">pritamps</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  
+</footer>
+
+  </div>
+</body>
+
+</html>
