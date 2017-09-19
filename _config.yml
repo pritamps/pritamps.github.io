@@ -14,6 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Programming Blog
+author: Pritam Sukumar
 email: pritamps@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   My space on the internet to write about Computer Science (and Aerospace?) related things
@@ -27,7 +28,7 @@ markdown: kramdown
 kramdown:
   math_engine: mathjax
 
-theme: minima
+theme: cssgrid_theme
 plugins:
   - jekyll-feed
 
