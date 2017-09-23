@@ -1,5 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-19T15:45:40+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
-</subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Shallow Neural Networks</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html" rel="alternate" type="text/html" title="Shallow Neural Networks" /><published>2017-08-24T10:25:00+05:30</published><updated>2017-08-24T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html">&lt;p&gt;Before we get neck-deep into deep neural networks, let’s wade into shallow waters and use a two layer network (one hidden layer, one output layer) to explore properites of neural networks in general. Let’s see how the notation extends to multiple layers, and what it means for our matrix computations and math.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-23T22:23:44+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
+</subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Deep Learning - Forward Propagation (with code!)</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/deeplearning-example.html" rel="alternate" type="text/html" title="Deep Learning - Forward Propagation (with code!)" /><published>2017-08-24T10:25:00+05:30</published><updated>2017-08-24T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/deeplearning-example</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/deeplearning-example.html">&lt;p&gt;Instead of covering the same ground over and over (networks, layers, nodes, you know it all now!), I’m going to jump right into getting the actual code out.&lt;/p&gt;
+
+&lt;p&gt;&lt;mark&gt;Full disclaimer&lt;/mark&gt;: This code is based on the assignments from the Coursera deeplearning course. So the structure of the final code I’ll develop will be the same as what Andrew Ng and co. use. The structure isn’t really the most efficient, but I’m treating this code as only a means to understanding the concepts. We’re all going to be using libraries and frameworks, eh?&lt;/p&gt;
+
+&lt;p&gt;If any of the following seems new or weird to you, feel free to go back over the previous tutorials and posts. A good place to start would be &lt;a href=&quot;/introduction/deeplearning/2017/08/10/deep-learning-1.html&quot;&gt;the introductory post on this blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The main steps to learning with neural networks are:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Initialise the nodes and variables&lt;/li&gt;
+  &lt;li&gt;Perform Gradient Descent
+    &lt;ol&gt;
+      &lt;li&gt;Forward Propagation&lt;/li&gt;
+      &lt;li&gt;Back Propagation (Is this one word or two?)&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Pray that everything has gone well&lt;/li&gt;
+  &lt;li&gt;Realise that this is the real world and everything has probably &lt;em&gt;not&lt;/em&gt; gone well, and you’ll have to debug&lt;/li&gt;
+  &lt;li&gt;Try different things and get good-enough performance&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;When I say real-world, I really do mean real-world. I’m no longer bound by the confines of the Coursera course, except of course that I’ll be copying code I wrote there in the structure they gave me 🤷🏽‍.&lt;/p&gt;
+
+&lt;p&gt;The problem we will be trying to solve is to recognize bird sounds. It’s certainly not an easy problem, but I’ve worked on it briefly already last year. I’ll introduce it soon enough, so hang on to your..seats!&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Instead of covering the same ground over and over (networks, layers, nodes, you know it all now!), I’m going to jump right into getting the actual code out.</summary></entry><entry><title type="html">Shallow Neural Networks</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html" rel="alternate" type="text/html" title="Shallow Neural Networks" /><published>2017-08-24T10:25:00+05:30</published><updated>2017-08-24T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/08/24/week-3-part-1-shallownnrepresentation.html">&lt;p&gt;Before we get neck-deep into deep neural networks, let’s wade into shallow waters and use a two layer network (one hidden layer, one output layer) to explore properites of neural networks in general. Let’s see how the notation extends to multiple layers, and what it means for our matrix computations and math.&lt;/p&gt;
 
 &lt;p&gt;Here’s the mother-diagram for the rest of this post.&lt;/p&gt;
 
