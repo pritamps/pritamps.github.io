@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-25T10:09:06+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-27T15:51:30+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
 </subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Deep Learning Implementation</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html" rel="alternate" type="text/html" title="Deep Learning Implementation" /><published>2017-09-23T10:25:00+05:30</published><updated>2017-09-23T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html">&lt;p&gt;Instead of covering the same ground over and over (networks, layers, nodes, you know it all now!), I’m going to jump right into getting the actual code out.&lt;/p&gt;
 
 &lt;p&gt;&lt;mark&gt;Full disclaimer&lt;/mark&gt;: This code is based on the assignments from the Coursera deeplearning course. So the structure of the final code I’ll develop will be the same as what Andrew Ng and co. use. The structure isn’t really the most efficient, but I’m treating this code as only a means to understanding the concepts. We’re all going to be using libraries and frameworks, eh?&lt;/p&gt;
@@ -611,18 +611,21 @@ z &amp;amp;= w^Tx + b
   &lt;li&gt;We’re going down, down, down, making good progress on our steepest paths. How do we know when we’ve reached a valley? You got it! We know we’ve reached a valley when we’ve stopped going down, i.e. the hill has become flat. Or we start going up again!&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;It turns out (not by coincidence, but by math), that the steepest path down a function’s surface corresponds to the direction of its gradient. To put in terms of our four steps above, gradient descent involves:&lt;/p&gt;
+&lt;p&gt;It turns out (not by coincidence, but by math), that the steepest path down a function’s surface corresponds to the opposite direction of its gradient. To put in terms of our four steps above, gradient descent involves:&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;Assume starting values for all parameters &lt;script type=&quot;math/tex&quot;&gt; (w, b) &lt;/script&gt; in our case&lt;/li&gt;
   &lt;li&gt;Calculate the gradient: The gradient is given by &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial b} \displaystyle\right) &lt;/script&gt;. Note that the derivative &lt;script type=&quot;math/tex&quot;&gt; \displaystyle \frac{ \partial J}{\partial w} &lt;/script&gt; is a vector with the same size as &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt;&lt;/li&gt;
-  &lt;li&gt;Update the parameters: 
+  &lt;li&gt;
+    &lt;p&gt;Update the parameters: 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;
 \begin{aligned}
 w &amp;amp;= w - \alpha \frac{ \partial J}{\partial w} \\
 b &amp;amp;= b - \alpha \frac{ \partial J}{\partial b}
 \end{aligned}
-&lt;/script&gt;&lt;/li&gt;
+&lt;/script&gt;
+&lt;mark&gt;Edit&lt;/mark&gt;: There was a mistake in the previous version of the article. I had failed to recognize that the gradient gives the direction of maximum increase of a function. So, correction! We go in the opposite direction of the gradient because the way calculus is set up, the gradient points in the direction of maximum increase of a function. Thanks Asutosh for pointing this out!&lt;/p&gt;
+  &lt;/li&gt;
   &lt;li&gt;Repeat till convergence, i.e till the values of &lt;script type=&quot;math/tex&quot;&gt; w &lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt; b &lt;/script&gt; don’t change much with new iterations&lt;/li&gt;
 &lt;/ol&gt;
 

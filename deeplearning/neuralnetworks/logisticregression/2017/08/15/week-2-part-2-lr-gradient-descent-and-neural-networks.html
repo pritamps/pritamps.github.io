@@ -242,18 +242,21 @@ z &amp;= w^Tx + b
   <li>We’re going down, down, down, making good progress on our steepest paths. How do we know when we’ve reached a valley? You got it! We know we’ve reached a valley when we’ve stopped going down, i.e. the hill has become flat. Or we start going up again!</li>
 </ol>
 
-<p>It turns out (not by coincidence, but by math), that the steepest path down a function’s surface corresponds to the direction of its gradient. To put in terms of our four steps above, gradient descent involves:</p>
+<p>It turns out (not by coincidence, but by math), that the steepest path down a function’s surface corresponds to the opposite direction of its gradient. To put in terms of our four steps above, gradient descent involves:</p>
 
 <ol>
   <li>Assume starting values for all parameters <script type="math/tex"> (w, b) </script> in our case</li>
   <li>Calculate the gradient: The gradient is given by <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial b} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script></li>
-  <li>Update the parameters: 
+  <li>
+    <p>Update the parameters: 
 <script type="math/tex; mode=display">
 \begin{aligned}
 w &amp;= w - \alpha \frac{ \partial J}{\partial w} \\
 b &amp;= b - \alpha \frac{ \partial J}{\partial b}
 \end{aligned}
-</script></li>
+</script>
+<mark>Edit</mark>: There was a mistake in the previous version of the article. I had failed to recognize that the gradient gives the direction of maximum increase of a function. So, correction! We go in the opposite direction of the gradient because the way calculus is set up, the gradient points in the direction of maximum increase of a function. Thanks Asutosh for pointing this out!</p>
+  </li>
   <li>Repeat till convergence, i.e till the values of <script type="math/tex"> w </script> and <script type="math/tex"> b </script> don’t change much with new iterations</li>
 </ol>
 
