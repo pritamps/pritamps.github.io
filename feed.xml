@@ -1,9 +1,65 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2017-09-27T15:51:30+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
-</subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Deep Learning Implementation</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html" rel="alternate" type="text/html" title="Deep Learning Implementation" /><published>2017-09-23T10:25:00+05:30</published><updated>2017-09-23T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html">&lt;p&gt;Instead of covering the same ground over and over (networks, layers, nodes, you know it all now!), I’m going to jump right into getting the actual code out.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.2">Jekyll</generator><link href="https://pritamps.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://pritamps.github.io/" rel="alternate" type="text/html" /><updated>2018-05-12T17:07:04+05:30</updated><id>https://pritamps.github.io/</id><title type="html">Programming Blog</title><subtitle>My space on the internet to write about Computer Science (and Aerospace?) related things
+</subtitle><author><name>Pritam Sukumar</name></author><entry><title type="html">Paper Review: Gradient-based Learning Applied to Document Recognition</title><link href="https://pritamps.github.io/deeplearning/literature_review/2018/02/25/lenet5_paper_summary.html" rel="alternate" type="text/html" title="Paper Review: Gradient-based Learning Applied to Document Recognition" /><published>2018-02-25T10:25:00+05:30</published><updated>2018-02-25T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/literature_review/2018/02/25/lenet5_paper_summary</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/literature_review/2018/02/25/lenet5_paper_summary.html">&lt;p&gt;Paper being reviewed: &lt;em&gt;Paper Review: Gradient-based Learning Applied to Document Recognition&lt;/em&gt;
+Authors: Yann LeCun, Leon Bottou, Yoshua Bengio, and Patrick Haffner&lt;/p&gt;
+
+&lt;p&gt;Landmark paper because the network really worked and showed that you could do image recognition at a pixel level instead of feature extraction.&lt;/p&gt;
+
+&lt;p&gt;Later sections cover word handwriting recognition, which requires segmentation of digits. We don’t care about that, do we?&lt;/p&gt;
+
+&lt;p&gt;Notation is weird throughout the paper
+Important section: Convolutional Neural Networks for Isolated Character Recognition&lt;/p&gt;
+
+&lt;p&gt;More things covered: segmentation of written work into individual digits.&lt;/p&gt;
+
+&lt;p&gt;This post assumes you already know about convolutions and pooling. Until I write my own post about those things, &lt;a href=&quot;https://cs231n.github.io/convolutional-networks/&quot;&gt;this&lt;/a&gt; is a great resource.&lt;/p&gt;
+
+&lt;h2 id=&quot;sections&quot;&gt;Sections&lt;/h2&gt;
+
+&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
+
+&lt;p&gt;Covers different ML types:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Learning from Data: Minimize a loss function defined as an extension of the error on the training set with a regularisation function. They call this Structural Risk Minimization&lt;/li&gt;
+  &lt;li&gt;Gradient based learning: The above loss function is minimised using normal or stochastic gradient descent.&lt;/li&gt;
+  &lt;li&gt;Gradient back-propagation: Allows for efficient computation of derivatives in a nonlinear multi-layer processing pipeline (such as a neural network).&lt;/li&gt;
+  &lt;li&gt;Learning in Handwriting Recognition Systems: Most challenging part is separating digits. One algorithm is heuristic over segmentation, where random cuts are generated over the training set and used to label characters versus not-characters. Then on the test sets, correct cuts can be found. Very expensive in all ways. Another is Graph Transformer Networks, introduced in this paper. We will come back to this. For segmentation, they just sweep over the image (convolutional style) and choose parts that contain a character.&lt;/li&gt;
+  &lt;li&gt;Globally Trainable Systems: Error is defined at document level (a global error). Typically recognition at word level treats words as acyclic graphs, with each edge and node giving the label and probability of the current character (like a HMM)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;convolutional-neural-networks-for-isolated-character-recognition&quot;&gt;Convolutional Neural Networks for Isolated Character Recognition&lt;/h3&gt;
+
+&lt;p&gt;The main section which introduces LeNet-5!&lt;/p&gt;
+
+&lt;h3 id=&quot;results&quot;&gt;Results&lt;/h3&gt;
+
+&lt;p&gt;LeNet did well yay. On isolated characters&lt;/p&gt;
+
+&lt;h3 id=&quot;graph-transformer-networks&quot;&gt;Graph Transformer Networks&lt;/h3&gt;
+
+&lt;p&gt;Backpropagation for multi-module networks.&lt;/p&gt;
+
+&lt;h3 id=&quot;heuristic-over-segmentation&quot;&gt;Heuristic Over Segmentation&lt;/h3&gt;
+
+&lt;p&gt;Problem of separating digits and/or letters in handwriting&lt;/p&gt;
+
+&lt;h3 id=&quot;global-training&quot;&gt;Global training&lt;/h3&gt;
+
+&lt;p&gt;Heuristic Over Segmentation gives error at character level. Global training takes this error to string level without individual character naming.&lt;/p&gt;
+
+&lt;h3 id=&quot;space-displacement-neural-network&quot;&gt;Space Displacement Neural Network&lt;/h3&gt;
+
+&lt;p&gt;Cool idea&lt;/p&gt;
+
+&lt;h3 id=&quot;crazy-math-section&quot;&gt;Crazy Math Section&lt;/h3&gt;
+
+&lt;h3 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h3&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Paper being reviewed: Paper Review: Gradient-based Learning Applied to Document Recognition Authors: Yann LeCun, Leon Bottou, Yoshua Bengio, and Patrick Haffner</summary></entry><entry><title type="html">Deep Learning Implementation</title><link href="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html" rel="alternate" type="text/html" title="Deep Learning Implementation" /><published>2017-09-23T10:25:00+05:30</published><updated>2017-09-23T10:25:00+05:30</updated><id>https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example</id><content type="html" xml:base="https://pritamps.github.io/deeplearning/neuralnetworks/2017/09/23/deeplearning-example.html">&lt;p&gt;Instead of covering the same ground over and over (networks, layers, nodes, you know it all now!), I’m going to jump right into getting the actual code out.&lt;/p&gt;
 
 &lt;p&gt;&lt;mark&gt;Full disclaimer&lt;/mark&gt;: This code is based on the assignments from the Coursera deeplearning course. So the structure of the final code I’ll develop will be the same as what Andrew Ng and co. use. The structure isn’t really the most efficient, but I’m treating this code as only a means to understanding the concepts. We’re all going to be using libraries and frameworks, eh?&lt;/p&gt;
 
 &lt;p&gt;If any of the following seems new or weird to you, feel free to go back over the previous tutorials and posts. A good place to start would be &lt;a href=&quot;/introduction/deeplearning/2017/08/10/deep-learning-1.html&quot;&gt;the introductory post on this blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\alpha + \beta&lt;/script&gt;
 
 &lt;p&gt;The main steps to learning with neural networks are:&lt;/p&gt;
 
@@ -919,11 +975,14 @@ b &amp;amp;= b - \alpha \frac{ \partial J}{\partial b}
 &lt;p&gt;I want to use this space to keep notes on what I’m learning, and also maybe write tutorials once in a while if I can find the enthusiasm and put in the time. Right now, I’m learning:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Deep Learning from Andrew Ng’s &lt;a href=&quot;https://www.coursera.org/specializations/deep-learning&quot;&gt;Deep Learning &lt;/a&gt; course on Coursera&lt;/li&gt;
-  &lt;li&gt;iOS from the &lt;a href=&quot;https://itunes.apple.com/us/course/developing-ios-10-apps-with-swift/id1198467120&quot;&gt;Stanford CS193p course&lt;/a&gt; on iTunes&lt;/li&gt;
+  &lt;li&gt;Deep Learning from Andrew Ng’s [Deep Learning ][deep-learning] course on Coursera&lt;/li&gt;
+  &lt;li&gt;iOS from the [Stanford CS193p course][cs193p] on iTunes&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;So hopefully you’ll see tutorials on all those things. Good luck!&lt;/p&gt;
+&lt;p&gt;So hopefully you’ll see tutorials on all those things. Good luck!
+Cheers,
+Pritam&lt;/p&gt;
 
-&lt;p&gt;Cheers,
-Pritam&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Hi! I’m Pritam Sukumar, a freelance Software Engineer travelling around in India while working on pet projects and being a project reviewer for the Udacity Artificial Intelligence Nanodegree.</summary></entry></feed>
+&lt;p&gt; 
+[deep-learning]: https://www.coursera.org/specializations/deep-learning
+[cs193p]: https://itunes.apple.com/us/course/developing-ios-10-apps-with-swift/id1198467120&lt;/p&gt;</content><author><name>Pritam Sukumar</name></author><summary type="html">Hi! I’m Pritam Sukumar, a freelance Software Engineer travelling around in India while working on pet projects and being a project reviewer for the Udacity Artificial Intelligence Nanodegree.</summary></entry></feed>
