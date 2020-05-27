@@ -1,0 +1,16 @@
+img + em { display: block; text-align: center; font-size: 10pt}
+
+#markdown-toc ul {
+    list-style: decimal;
+}
+
+#markdown-toc {
+    border: 1px solid #aaaaaa;
+    background: rgba(230, 230, 230, 0.96);
+    padding-left: 2em;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    list-style: decimal;
+    display: inline-block;
+}
