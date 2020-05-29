@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>
+     | Programming Blog
+  </title>
+
+  
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+	<link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+
+  
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/modern-normalize@0.6.0/modern-normalize.css"
+  />
+
+  
+  
+	
+  <link rel="stylesheet" href="https://pritamps.github.io/css/basic.min.8be53fffd231757375f4b7eb78dd0e1515cd45a761fefd573af23ada70f7041f.css" />
+  <link rel="stylesheet" href="https://pritamps.github.io/css/main.min.1274937ae5d78d419eff68b08446f83e3882aae191d47cacd17e9f02b2e75fcf.css" />
+
+  
+	
+		
+	
+</head>
+
+    <body>
+        <header id="header">
+  <div class="header_container">
+    <h1 class="sitetitle">
+      <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a>
+    </h1>
+    <nav class="navbar">
+      <ul>
+        <li><a href="https://pritamps.github.io">Home</a></li>
+        
+        <li class="hide-sm"><a href="https://pritamps.github.io/index.xml" type="application/rss+xml">RSS</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        
+<section id="main">
+  <article class="post content">
+    <h2 class="title"></h2>
+    <div class="post_content">
+      
+
+<p>Before we get neck-deep into deep neural networks, let&rsquo;s wade into shallow waters and use a two layer network (one hidden layer, one output layer) to explore properites of neural networks in general. Let&rsquo;s see how the notation extends to multiple layers, and what it means for our matrix computations and math.</p>
+
+<p>Here&rsquo;s the mother-diagram for the rest of this post.</p>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week3/shallow_nn.png" alt="Shallow Neural Network Representation" />
+<em>Why the ugly diagram? I just bought one of those drawing tables, so I&rsquo;m learning how to use it!</em>
+{: refdef}</p>
+
+<p>I&rsquo;m going to do something silly, just because I can. Even though you probably understand this diagram already, I&rsquo;m going to build it from the ground up. For even more understanding. Not sure what I mean? Well, read on!</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<p>{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}</p>
+
+<h2 id="the-layers">The Layers</h2>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week3/layers.png" alt="Layers in the Shallow Neural Network" />
+<em>Just the layers</em>
+{: refdef}</p>
+
+<p>As you can see, this neural network has three layers:</p>
+
+<ol>
+<li>The input layer (<script type="math/tex"> l = 0 </script>): contains the input vector <script type="math/tex"> x </script></li>
+<li>The hidden layer (<script type="math/tex"> l = 1 </script>): contains the neurons that do the neural network magic</li>
+<li>The output layer (<script type="math/tex"> l = 2 </script>): gets us our output <script type="math/tex"> \hat{y} </script></li>
+</ol>
+
+<p>But in common terminology, we ignore the input layer when counting (that&rsquo;s why <script type="math/tex"> l = 0 </script> for the input layer), but we do count the output layer. So this network is a <mark>two layer neural network</mark>.</p>
+
+<p>Notation: <script type="math/tex"> L </script> is the total number of layers and <script type="math/tex"> l </script> can refer to any individual layer, i.e. <script type="math/tex"> l \in {0, 1, \ldots L} </script>. In our example neural network above, <script type="math/tex"> L = 2 </script>.</p>
+
+<h3 id="why-is-the-hidden-layer-called-a-hidden-layer">Why is the hidden layer called a hidden layer?</h3>
+
+<p>The reason that the hidden layer is called &ldquo;hidden&rdquo; is that <mark>we don&rsquo;t see the values the weights there get during training</mark>. After the network is trained, we input <script type="math/tex"> x </script>, and get our predicted label <script type="math/tex"> \hat{y} </script>. We don&rsquo;t know what all the layers in between are doing. As far as we&rsquo;re concerned, they&rsquo;re <em>hidden</em>.</p>
+
+<h2 id="the-activations">The Activations</h2>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week3/activations.png" alt="Activations in the Shallow Neural Network" />
+<em>Layers and activations</em>
+{: refdef}</p>
+
+<p>Each neuron behaves like we&rsquo;ve already examined [before][week-2-part-1]: it applies a linear transformation ( <script type="math/tex"> z = w^Tx + b </script> ) and then an activation function to it ( <script type="math/tex"> a(z) = g(w^Tx + b) </script>). With that in mind, we are ready to introduce our new notation for a node.</p>
+
+<p>For <mark>an individual node <script type="math/tex"> i </script> in layer <script type="math/tex"> l </script></mark>, the activation function is given by:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+a^{[l]}_i &= g (z^{[l]}_i) \\
+          &= g (w^{[l]^T}_i x + b^{[L]}_i)  
+\end{aligned}
+</script>
+
+<h2 id="connecting-the-layers">Connecting the Layers</h2>
+
+<p>With individual nodes done, we turn to connecting the layers. The notation here now develops so that <mark>for layer  <script type="math/tex"> l </script></mark>, <script type="math/tex"> a^{[l]} </script> represents the vector of all the individual activations,  <script type="math/tex"> w^{[l]} </script> represents that <em>matrix</em> of all weights and so on. Thus, we can write:</p>
+
+<script type="math/tex; mode=display">
+a^{[l]} = g (W^{[l]} a^{[l-1]}+ b^{[l]})
+</script>
+
+<p>Note how I slyly slipped in <script type="math/tex"> a^{[l-1]} </script> instead of <script type="math/tex"> x </script> in there. If you think about it, it makes sense, because the <script type="math/tex"> x </script> for each layer is just the output of the layer that came before it. afsdf</p>
+
+<p>The weight vector got upgraded to a capital <script type="math/tex"> W </script> because it&rsquo;s now a matrix. Note that the <mark>Weight Matrix has the weight vectors stacked row-wise instead of column-wise</mark>. This is beacuse, as far as I can tell, because Andrew said so in the course, and it makes for easier multiplication, i.e.</p>
+
+<script type="math/tex; mode=display">
+W^{[l]}_{n_l \times n_{l-1}} = \begin{bmatrix}
+w^{[1]^T}_1 \\
+w^{[1]^T}_2 \\
+. \\
+.\\
+w^{[1]^T}_{n_l}
+\end{bmatrix}
+</script>
+
+<p>The dimensions <script type="math/tex"> n<em>l </script>  and <script type="math/tex"> n</em>{l-1} </script> refer to the number of nodes/neurons in layers <script type="math/tex"> l </script> and <script type="math/tex"> l-1 </script> respectively. This will become clearer as we move through the rest of this post.</p>
+
+<p>Let&rsquo;s see what all this means for our specific neural network.</p>
+
+<h3 id="layer-0-to-layer-1">Layer 0 to Layer 1</h3>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week3/layer0to1.png" alt="Connecting Layers 0 and 1" />
+<em>Layers 0 and 1 connected!</em>
+{: refdef}</p>
+
+<p>The arrows are connected. Our input is of size <script type="math/tex"> x \in \mathbb{R}_{3 \ times 1} </script>, i.e <script type="math/tex"> n_x = 3 </script>. Layer 1, our hidden layer is of size <script type="math/tex"> n_h^{[1]} = 4 </script>. Note the notation introduced here: <script type="math/tex"> n_h^{[l]} </script> is the number of nodes in hidden layer <script type="math/tex"> l </script>. So, we can write out, with dimensions:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+z^{[1]}_{4 \times 1} &= W^{[1]}_{ 4 \times 3} a^{[0]}_{3 \times 1} + b^{[1]}_{4 \times 1} \\
+\text{where } a^{[0]} &= x
+\end{aligned}
+</script>
+
+<p>Using the activation functions, we get;</p>
+
+<script type="math/tex; mode=display">
+a^{[1]}_{4 \times 1} = g^{[1]} (z^{[1]})
+</script>
+
+<p>where <script type="math/tex"> g^{[1]} </script> represents the array of activation functions for the first layer. Yes, this means each individual node gets its own activation function, a fact I&rsquo;m conveniently glossing over for the purposes of this post. I&rsquo;ll talk about it in another post.</p>
+
+<p>Now, let&rsquo;s move on to the next layer!</p>
+
+<h3 id="layer-1-to-layer-2">Layer 1 to Layer 2</h3>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week3/layer1to2.png" alt="Connecting Layers 1 and 2" />
+<em>Layers 1 and 2 connected!</em>
+{: refdef}</p>
+
+<p>The activations and output of the second layer become:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+z^{[2]}_{1 \times 1} &= W^{[2]}_{ 1 \times 4} a^{[1]}_{4 \times 1} + b^{[2]}_{1 \times 1} \\
+\hat{y} &= a^{[2]} = g^{[2]} (z^{[2]})
+\end{aligned}
+</script>
+
+<h2 id="the-full-network">The Full Network</h2>
+
+<p>That&rsquo;s it! That&rsquo;s our full network. So, to summarize, the equations are:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+z^{[1]}_{4 \times 1} &= W^{[1]}_{ 4 \times 3} a^{[0]}_{3 \times 1} + b^{[1]}_{4 \times 1}  \text{ where } a^{[0]} = x \\
+a^{[1]}_{4 \times 1} &= g^{[1]}(z^{[1]}) \\
+z^{[2]}_{1 \times 1} &= W^{[2]}_{ 1 \times 4} a^{[1]}_{4 \times 1} + b^{[2]}_{1 \times 1} \\
+\hat{y}_{1 \times 1} &= a^{[2]}_{1 \times 1} = g^{[2]} (z^{[2]})
+\end{aligned}
+</script>
+
+<p>You might be wondering why I&rsquo;m insistently putting the sizes on there. Well, it&rsquo;s because these matrix sizes are my Achilles Heel. I get confused with every aspect of them: rows and columns, sizes, dot products, multiplications. So I have to be careful. If you see something wrong there, let me know!</p>
+
+<h2 id="training-with-multiple-examples">Training With Multiple Examples</h2>
+
+<p>If you hadn&rsquo;t noticed so far, let me be the one to remind you that everything we did so far was for one training example. But of course, for our neural network, we have <script type="math/tex"> m </script> training example, i.e. it&rsquo;s matrix time! We&rsquo;ve done most of this in</p>
+
+<p>Our training matrix <script type="math/tex"> X </script> is just the individual feature vectors stacked next to each other:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+X_{3 \times m} &= \displaystyle \left[ x^{(1)}_{3\times 1} \quad \ldots \quad x^{(m)}_{3 \times 1} \right] \\
+\text{i.e. }A^{[0]}_{3 \times m} &= X = \displaystyle \left[ a^{[0](1)} \quad \ldots \quad a^{[0](m)} \right]
+\end{aligned}
+</script>
+
+<p>Yup, that&rsquo;s right. We now have square brackets AND parantheses. What a wonderful time to be alive!</p>
+
+<p>Traversing through to layer 1, we get</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+Z^{[1]}_{4 \times m} &= W^{[1]^T}_{4 \times 3} A^{[0]}_{3 \times m} + b^{[1]}_{4 \times 1} \\
+                    &= \displaystyle \left[ z^{[1](1)}_{4\times 1} \quad \ldots \quad z^{[1](m)}_{4\times 1} \right] \\
+A^{[1]}_{4 \times m} &= g^{[1]}(Z^{[1]}) \\
+                    &= \displaystyle \left[ a^{[1](1)}_{4\times 1} \quad \ldots \quad a^{[1](m)}_{4\times 1} \right]
+\end{aligned}
+</script>
+
+<p>And then onto layer 2 (the output layer, <mark>our predictions</mark>), our matrices are updated as:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+Z^{[2]}_{m \times 1} &= W^{[2]^T}_{1 \times 4} A^{[1]}_{4 \times m} + b^{[2]}_{1 \times 1} \\
+\hat{Y}_{m \times 1} &= A^{[2]} = g^{[2]}(Z^{[2]})
+\end{aligned}
+</script>
+
+<h2 id="gradient-descent">Gradient Descent</h2>
+
+<p>Phew. That&rsquo;s our problem and the network defined. Now we&rsquo;re ready to do our gradient descent. If you need a refresher, look [here][week-2-part-3] where we did this for a single neuron. Thankfully, differentiation is linear, and our derivatives are linearly independent (if you don&rsquo;t care what those terms mean, you can still be a great deep learning guy, don&rsquo;t worry!), what applies to one neuron easily extends to the full set. The basic steps are:</p>
+
+<ol>
+<li>Initialize <script type="math/tex"> W, b </script></li>
+<li>Find updates through forward propagation and backpropagation</li>
+<li>Repeat step 2 till convergence. Simple?</li>
+</ol>
+
+<p>Let&rsquo;s get started then?</p>
+
+<h3 id="initialisation">Initialisation</h3>
+
+<p>For [our problem in the previous post][week-2-part-3] involving a single neuron and logistic regression, we said it was fine to initialize all variables to zero. I mean there&rsquo;s a single neuron, and it can learn anyway.  Here, we have <em>multiple neurons</em> (in fact a whole network!), and initialising them to zero won&rsquo;t work. Even initialising all of them to the same value won&rsquo;t work.</p>
+
+<p>Any guesses why?</p>
+
+<p>I&rsquo;m not sure if you got that right or wrong, so I&rsquo;m just going to tell you. It&rsquo;s because, if you initialise all of them to the same value, they will all be computing the same function as the &ldquo;signal passes through the network&rdquo;. What that means is that instead of a whole layer, you might just have one big neuron! Cool logic, eh?</p>
+
+<p>Instead, we initialise all these things to small values, between 0 and 1 usually. They&rsquo;re small because some of our choices for activation functions have nice non-zero values for their derivatives close to zero.</p>
+
+<h3 id="forward-propagation">Forward Propagation</h3>
+
+<p>We&rsquo;ve done this before already in this very post, so I&rsquo;ll just write out the equations. The only change here will be that the <mark>activation function in the final layer will always be the sigmoid <script type="math/tex"> \sigma(z)</script></mark>, while the other activation functions are up to us. The reasoning for this will be explained later (or not all, I haven&rsquo;t decided yet!).</p>
+
+<p>So, the forward propagation update is:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+Z^{[1]} &= W^{[1]} A^{[0]} + b^{[1]} \\
+A^{[1]} &= g^{[1]}(Z^{[1]}) \\
+Z^{[2]} &= W^{[2]} A^{[1]} + b^{[2]} \\
+A^{[2]} &= g^{[2]}(Z^{[2]})   \\
+        &= \sigma(Z^{[2]})
+\end{aligned}
+</script>
+
+<h2 id="back-propagation">Back Propagation</h2>
+
+<p>The math involved in calculating the derivatives is very complicated. I know because Andrew Ng said so! But also, I remember it being a pain when I learnt neural networks in graduate school. It&rsquo;s actually <em>very interesting</em> to get into matrix calculus, but maybe I&rsquo;ll do it in a post of its own. Here are the back-propagation update rules, <mark>written for the second layer first and then the first layer</mark> because hey, we&rsquo;re going backwards!</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+dZ^{[2]} &= A^{[2]} - Y \text { (}Y_{m \times 1} \text{ are training labels) } \\
+dW^{[2]} &= \frac{1}{m} dZ^{[2]}A^{[1]^T} \\
+db^{[2]} &= \frac{1}{m} \sum dZ^{[2]} \\
+dZ^{[1]} &= \left( W^{[2]^T}dZ^{[2]} \right) \cdot \left( g^{\prime[2]}(Z^{[1]}) \right) \\
+dW^{[1]} &= \frac{1}{m} dZ^{[1]}A^{[0]^T}   \\
+db^{[1]} &= \frac{1}{m} dZ^{[1]}
+\end{aligned}
+</script>
+
+<p>There you have it, the six commandments of back-propagation &ndash; some crazy math and many PhDs have gone into producing those equations. Phew!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>I have to say, this is a major achievement. You really should pat yourself on the back for this. We have the general update rules for a single-layer neural network. And even looking at it, you should be able to see that extending this to multiple layers <em>will not be hard</em>. There&rsquo;s a certain symmetry about the rules of update, eh?</p>
+
+<p>Next post, we&rsquo;ll go into actual deep neural networks! Yay! And after that some code, hopefully.</p>
+
+<p>For now, if you see any errors here, please leave a comment and I&rsquo;ll correct it promptly. If you have any questions, also leave a comment and I&rsquo;ll answer to the best of my abilities!</p>
+
+<p>[week-2-part-3]: {{ site.baseurl }}{% post_url 2017-08-19-week-2-part-3-optimise %}
+[week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}</p>
+
+    </div>
+    <div class="info post_meta">
+      <time datetime=0001-01-01T00:00:00Z class="date">Monday, January 1, 0001</time>
+      
+      
+    </div>
+    <div class="clearfix"></div>
+  </article>
+	
+		<div class="other_posts">
+			
+			<a href="https://pritamps.github.io/post/2017-09-23-deeplearning-example/" class="prev"></a>
+			
+			
+			<a href="https://pritamps.github.io/post/2017-08-19-week-2-part-3-optimise/" class="next"></a>
+			
+		</div>
+		<aside id="comments">
+</aside>
+
+	
+</section>
+
+        <a id="back_to_top" title="Go To Top" href="#">
+  <span>
+    <svg viewBox="0 0 24 24">
+      <path fill="none" d="M0 0h24v24H0z"></path>
+      <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"></path>
+    </svg>
+  </span>
+</a>
+
+        <footer id="footer">
+  <p>
+    <span>&copy; 2020 <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a> </span>
+    <span>Built with <a rel="nofollow" target="_blank" href="https:/gohugo.io">Hugo</a></span>
+    <span>Theme by <a rel="nofollow" target="_blank" href="https://github.com/wayjam/hugo-theme-mixedpaper">WayJam</a></span>
+  </p>
+
+  <script src="https://pritamps.github.io/js/main.min.eac174914a2c8d5b3cc7d2f766c41a23844a384c95187d52847b0b2e8c2b77a1.js" integrity="sha256-6sF0kUosjVs8x9L3ZsQaI4RKOEyVGH1ShHsLLowrd6E=" crossorigin="anonymous"></script>
+</footer>
+
+    </body>
+</html>

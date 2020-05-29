@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>
+     | Programming Blog
+  </title>
+
+  
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+	<link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+
+  
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/modern-normalize@0.6.0/modern-normalize.css"
+  />
+
+  
+  
+	
+  <link rel="stylesheet" href="https://pritamps.github.io/css/basic.min.8be53fffd231757375f4b7eb78dd0e1515cd45a761fefd573af23ada70f7041f.css" />
+  <link rel="stylesheet" href="https://pritamps.github.io/css/main.min.1274937ae5d78d419eff68b08446f83e3882aae191d47cacd17e9f02b2e75fcf.css" />
+
+  
+	
+		
+	
+</head>
+
+    <body>
+        <header id="header">
+  <div class="header_container">
+    <h1 class="sitetitle">
+      <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a>
+    </h1>
+    <nav class="navbar">
+      <ul>
+        <li><a href="https://pritamps.github.io">Home</a></li>
+        
+        <li class="hide-sm"><a href="https://pritamps.github.io/index.xml" type="application/rss+xml">RSS</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        
+<section id="main">
+  <article class="post content">
+    <h2 class="title"></h2>
+    <div class="post_content">
+      
+
+<p>Welcome to Part 3 of explaining logistic regression using neural networks! We gave a medium size picture of the whole thing in [Part 1][week-2-part-1] and then defined the optimization problem in [Part 2][week-2-part-2]. In this episode, we&rsquo;ll first develop an algorithm to solve the problem by iterating through the examples, and then use the awesome power of vectorization to go through all examples at once. So, let&rsquo;s get started, yeah?</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<p>{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}</p>
+
+<h2 id="recap">Recap</h2>
+
+<p>Remember the problem? No? Here it is again:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+\text{Minimize } J(w, b) &=  -\frac{1}{m} \displaystyle \sum_{i=1}^{m} \left(y_i \log a + (1-y_i) \log(1 - a \right) \\
+\text{where: } a(w, b) &= \hat{y} = \sigma(w^Tx + b) = \sigma(z)
+\end{aligned}
+</script>
+Refer to [Part 1][week-2-part-1] (and [Part 2][week-2-part-2] too I guess) if you're unclear on what any of those letters mean.
+
+The algorithm (also developed in [Part 2][week-2-part-2]) was shown to be:
+
+1. Assume starting values for all parameters <script type="math/tex"> (w, b) </script> in our case
+2. Calculate the gradient: The gradient is basically <script type="math/tex"> \displaystyle \left(\frac{ \partial J}{\partial w}, \frac{ \partial J}{\partial w} \displaystyle\right) </script>. Note that the derivative <script type="math/tex"> \displaystyle \frac{ \partial J}{\partial w} </script> is a vector with the same size as <script type="math/tex"> w </script> 
+3. Update the parameters: 
+<script type="math/tex; mode=display">
+\begin{aligned}
+w &= w - \alpha \frac{ \partial J}{\partial w} \\
+b &= b - \alpha \frac{ \partial J}{\partial b}
+\end{aligned}
+</script>
+4. Repeat till convergence, i.e till the values of <script type="math/tex"> w </script> and <script type="math/tex"> b </script> don't change much with new iterations
+
+In the [lectures][deep-learning], Andrew Ng took us through an example where he showed how the gradient was calculated. To simplify things, the feature vector was only of size 2. But we're big girls and boys, so let's have some fun and make our example general, i.e. of size <script type="math/tex"> n_x \times 1 </script>. If that means I have think more as I develop this example, so be it!
+
+## The Big Picture
+
+To give you the big picture, I've made a small picture:
+
+{:refdef: style="text-align: center;"}
+![Big picture for optimization](/assets/dl_week2/lr_nn-propagation.png)*Forward propagation and Back Propagation*
+{: refdef}
+
+Note the two newly introduced terms, forward propagation and backward propagation. Here's what the terms mean:
+
+1. **Forward propagation**: In this step, the input feature vector is fed through the neuron with the current values of the parameters <script type="math/tex"> (w, b) </script>. The cost function <script type="math/tex"> J </script> is calculated with the fresh values of the outputs. This is where *predictions are made*.
+2. **Back Propagation**: Here, the derivatives of <script type="math/tex"> (w, b) </script> with respect to the cost function <script type="math/tex"> J </script> are calculated. Then the values of our parameters are updated.
+
+<mark> A quick note on the calculation of derivatives </mark>: The derivatives are calculated using this *awesome, cool, amazing* technique called a <mark>Computational Graph</mark>. This technique is really cool, and I found someone online who explains it much better than I ever could. Here's [his awesome article][computational-graph]. I highly recommend reading through it. It's much better than the lecture on Computational Graphs in the Coursera course.
+
+## The Calculation of Derivatives
+
+So...I'm not going into too much detail here, because most of this is algebra. It is interesting algebra for sure, but the results are sufficient for this post. 
+
+You can do most of the derivations by hand, or even use Wolfram Alpha. I'm just going to list them out.
+
+Before I do, there is *one* important thing I'd like to mention:
+
+<script type="math/tex; mode=display">
+\displaystyle \frac{\partial J}{\partial w_i} = \displaystyle \frac{1}{m} \displaystyle \sum_i^m \displaystyle \frac{\partial \mathbb{L(a^{(i)}, y)}}{\partial w_i}
+</script>
+
+<p>The reason this is true is that we <strong>assume</strong> the weights are independent of each other, so *only the <script type="math/tex"> i^{th} </script> weight corresponds to its partial derivative. The reason this is important is that to calculate <script type="math/tex"> \displaystyle \frac{\partial J}{\partial w_i}</script>, we only need to calculate <script type="math/tex"> \displaystyle\frac{\partial \mathbb{L}}{\partial w_i} </script>, which is easily found out.</p>
+
+<p>As promised, here are the significant derivatives involved. All of these are defined for a <em>single</em> example:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+\displaystyle \frac{\partial \mathbb{J}}{\partial a} &= \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial a} = \frac{1}{m} \left( -\frac{y}{a} + \frac{1-y}{1-a} \right) \\
+\displaystyle \frac{\partial \mathbb{J}}{\partial z} &= \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial z} = \frac{1}{m} (a - y) \\
+\displaystyle \frac{\partial \mathbb{J}}{\partial w_i} &= dw_i = \frac{1}{m} \displaystyle \frac{\partial \mathbb{L}}{\partial w_i} = x_i \frac{\partial \mathbb{L}}{\partial z_i}
+\end{aligned}
+</script>
+
+<h2 id="the-algorithm-for-script-type-math-tex-m-script-examples">The Algorithm for <script type="math/tex"> m </script> examples</h2>
+
+<p>I&rsquo;ll lay out algorithm here, to iterate over <script type="math/tex"> m </script> examples. The idea is to repeatedly iterate till the cost function <script type="math/tex"> J </script> converges.</p>
+
+<ol>
+<li><p>Initialize values:
+<script type="math/tex; mode=display">
+\begin{aligned}
+J &amp;= 0 <br />
+w &amp;= [0, 0, \ldots 0]_{1 \times n_x} <br />
+b &amp;= 0<br />
+\end{aligned}
+</script></p></li>
+
+<li><p><mark> Outer Loop</mark>: For each example <script type="math/tex"> i \in [1,2, \ldots m ]</script>:
+<script type="math/tex; mode=display">
+\begin{aligned}
+z^{(i)} &amp;= w^T x^{(i)} + b <br />
+a^{(i)} &amp;= \sigma(z^{(i)}) <br />
+\mathbb{L}^{(i)} &amp;= - \left( y^{(i)} \log a^{(i)} + (1 - y^{(i)}) \log (1 - a^{(i)}) \right) <br />
+J = J + \mathbb{L}^{(i)}
+dz^{(i)} &amp;= a^{(i)} - y^{(i)} <br />
+\text{Set } dw &amp;= [0, 0, \ldots 0]_{1 \times n_x}, db = 0 <br />
+\end{aligned}
+</script>
+2.1. <mark>Inner Loop</mark>: For each element <script type="math/tex"> k \in [1, 2, \ldots n_x] </script>
+<script type="math/tex; mode=display">
+\begin{aligned}
+dw_k &amp;= dw_k + x_k^{(i)} dz^{(i)} <br />
+db &amp;= db + dz^{(i)}
+\end{aligned}
+</script></p></li>
+
+<li><p>Update (w,b) as:
+<script type="math/tex; mode=display">
+\begin{aligned}
+w &amp;= w + \displaystyle \frac{1}{m} dw <br />
+b &amp;= b + \displaystyle \frac{1}{m} db <br />
+\end{aligned}
+</script></p></li>
+
+<li><p>Repeat steps 1, 2, and 3 till the value of <script type="math/tex"> J </script> converges, i.e. it does not change with more iterations, or changes within a preset small value.</p></li>
+</ol>
+
+<p>Some explanation of what&rsquo;s going on here is probably required, so here it is:</p>
+
+<ol>
+<li>In the first step, we just initialize all the values to zero. Note the dimensions of the parameters. <script type="math/tex"> J \in \mathbb{R}, w \in \mathbb{R}_{1 \times n_x}, b \in \mathbb{R} </script></li>
+<li>We loop through the examples:
+
+<ul>
+<li><mark>Forward propagation: </mark>For each example, we calculate our predictions, and our loss function</li>
+<li><mark>Backward propagation: </mark>Then we loop through the individual feature vector for this example to find the contribution of this example to the weights. <mark>This is where information is transferred from the input feature vector to the output parameters</mark></li>
+</ul></li>
+<li>We update our parameters</li>
+<li>Repeat till convergence.</li>
+</ol>
+
+<p>I hope that&rsquo;s clear. If not, or if you see something wrong here, leave a comment and I&rsquo;ll update the post!</p>
+
+<h2 id="vectorization">Vectorization</h2>
+
+<p>In computation, and especially while dealing with large amounts of data, it&rsquo;s not very efficient to have these nested for loops in the code. Fortunately, most of the operations in the optimization above are <em>vectorizable</em>, i.e. they can be converted to matrix operations.</p>
+
+<p>Why would we want to convert these operations to matrix operations? Well, mathematicians have spent hundreds of years working out cool things related to matrices that make them extremely friendly to fast computation. Computer Scientists have also spent a lot of time on making matrix operations efficient, though not hundreds of years, but only because computers haven&rsquo;t existed that long.</p>
+
+<p>Python is especially bad at nested loops. Since it&rsquo;s an interpreted language, it can&rsquo;t make any optimizations of its own and becomes super slow. So, we vectorize!</p>
+
+<p>I&rsquo;m not going into the derivations here again, because again, it&rsquo;s just algebra, and this time, it&rsquo;s not even that complicated. You just need to know a little bit about how matrices work.</p>
+
+<p>But <mark>VERY IMPORTANTLY</mark>, remember that the matrix rules below <mark>are what you are going to use in your code finally!</mark></p>
+
+<h3 id="vectorized-logistic-regression">Vectorized Logistic Regression</h3>
+
+<p>The matrices and vectors involved are:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+X_{n_x \times m} &= [x^{(1)}, x^{(2)}, \ldots, x^{(m)}] \\
+y_{1 \times m} &= [y^{(1)}, y^{(2)}, \ldots, y^{(m)}] \\
+w_{m \times 1}^T &= [w_1, w_2, \ldots, w_m] \\
+Z &= [z^{(1)}, z^{(2)}, \ldots z^{(m)}] \\
+  &= w^TX + [b, b, \ldots b]_{1 \times m}
+\end{aligned}
+</script>
+
+<p>With that, we can calculate:</p>
+
+<script type="math/tex; mode=display">
+\begin{aligned}
+A &= \sigma(Z) \\
+  &= [a^{(1)}, a^{(2)}, \ldots, a^{(m)}] \\
+dZ &= A - Y \\
+   &= [(a^{(1)} - y^{(1)}), (a^{(2)} - y^{(2)}), \ldots, (a^{(m)} - y^{(m)})] \\
+dw &= \displaystyle \frac{1}{m} \displaystyle \sum XdZ^T \\
+db &= \displaystyle \frac{1}{m} \displaystyle \sum(dZ)
+\end{aligned}
+
+</script>
+
+<p>These matrix operations will replace the inside of the for loop in the algorithm outlined above. We <em>can</em> actually replace even the outer for loop, but that will involve some advanced mathematics we will get to later.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>So, there we have it. After a long and winding road, we&rsquo;ve gone through what it would take to do logistic regression using neural networks. Note that we <em>still have only one neuron</em>!</p>
+
+<p>Until next time, adios! Please feel free to leave comments below with questions, or complaints that I&rsquo;ve been too vague or too wordy or too crazy.</p>
+
+<p>[week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}</p>
+
+<p>[week-2-part-1]: {{ site.baseurl }}{% post_url 2017-08-12-week-2-logistic-regression-and-neural-networks-1 %}
+[week-2-part-2]: {{ site.baseurl }}{% post_url 2017-08-15-week-2-part-2-lr-gradient-descent-and-neural-networks %}</p>
+
+    </div>
+    <div class="info post_meta">
+      <time datetime=0001-01-01T00:00:00Z class="date">Monday, January 1, 0001</time>
+      
+      
+    </div>
+    <div class="clearfix"></div>
+  </article>
+	
+		<div class="other_posts">
+			
+			<a href="https://pritamps.github.io/post/2017-08-24-week-3-part-1-shallownnrepresentation/" class="prev"></a>
+			
+			
+			<a href="https://pritamps.github.io/post/2017-08-15-week-2-part-2-lr-gradient-descent-and-neural-networks/" class="next"></a>
+			
+		</div>
+		<aside id="comments">
+</aside>
+
+	
+</section>
+
+        <a id="back_to_top" title="Go To Top" href="#">
+  <span>
+    <svg viewBox="0 0 24 24">
+      <path fill="none" d="M0 0h24v24H0z"></path>
+      <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"></path>
+    </svg>
+  </span>
+</a>
+
+        <footer id="footer">
+  <p>
+    <span>&copy; 2020 <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a> </span>
+    <span>Built with <a rel="nofollow" target="_blank" href="https:/gohugo.io">Hugo</a></span>
+    <span>Theme by <a rel="nofollow" target="_blank" href="https://github.com/wayjam/hugo-theme-mixedpaper">WayJam</a></span>
+  </p>
+
+  <script src="https://pritamps.github.io/js/main.min.eac174914a2c8d5b3cc7d2f766c41a23844a384c95187d52847b0b2e8c2b77a1.js" integrity="sha256-6sF0kUosjVs8x9L3ZsQaI4RKOEyVGH1ShHsLLowrd6E=" crossorigin="anonymous"></script>
+</footer>
+
+    </body>
+</html>

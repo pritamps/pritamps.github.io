@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>
+     | Programming Blog
+  </title>
+
+  
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+	<link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+
+  
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/modern-normalize@0.6.0/modern-normalize.css"
+  />
+
+  
+  
+	
+  <link rel="stylesheet" href="https://pritamps.github.io/css/basic.min.8be53fffd231757375f4b7eb78dd0e1515cd45a761fefd573af23ada70f7041f.css" />
+  <link rel="stylesheet" href="https://pritamps.github.io/css/main.min.1274937ae5d78d419eff68b08446f83e3882aae191d47cacd17e9f02b2e75fcf.css" />
+
+  
+	
+		
+	
+</head>
+
+    <body>
+        <header id="header">
+  <div class="header_container">
+    <h1 class="sitetitle">
+      <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a>
+    </h1>
+    <nav class="navbar">
+      <ul>
+        <li><a href="https://pritamps.github.io">Home</a></li>
+        
+        <li class="hide-sm"><a href="https://pritamps.github.io/index.xml" type="application/rss+xml">RSS</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        
+<section id="main">
+  <article class="post content">
+    <h2 class="title"></h2>
+    <div class="post_content">
+      
+
+<p>In this post, we will go over the basics of the functioning of a neural network. The idea will be to use Logistic Regression and Gradient Descent to illustrate the fundamentally important concepts of <strong>forward propagation</strong> and <strong>backpropagation</strong>. As an example, we might write some code for image recognition, which should give you an idea of just how powerful neural networks.</p>
+
+<p>The post loosely follows (with some edits and additions by me) the lectures in Week 2 of the <a href="https://www.coursera.org/specializations/deep-learning">Deep Learning Specialisation on coursera</a>. The lectures in Week 2 covered a lot of ground (mostly because they glossed over a lot of cook stuff), so I&rsquo;m splitting this tutorial into two parts.</p>
+
+<p>In the first part, I&rsquo;ll introduce the notation (always a pain) and Logistic Regression itself.</p>
+
+<p>Throughout this tutorial, we&rsquo;ll be using the <mark>cat-or-not problem</mark> to illustrate the mathematical and algorithmic points made. The problem: given an image, the network should be trained to be able to say if there is a cat in it or not; i.e. a simple binary classification problem.</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<p>{:.no_toc}
+* Do not remove this line (it will not be displayed)
+{:toc}</p>
+
+<h2 id="a-brief-intro-to-logistic-regression-only-one-input-no-learning-yet">A Brief Intro to Logistic Regression &ndash; only one input, no learning yet!</h2>
+
+<p>Logistic Regression is an algorithm that was developed for binary classification. Let&rsquo;s get with our cat problem to get comfortable with the ideas behind the algorithm, the notations used, and all that jazz. The parameters involved in Logistic Regression are:</p>
+
+<ul>
+<li>What it takes in:
+
+<ul>
+<li><strong>Feature vectors</strong>: <em>One</em> feature vector is represented as <script type="math/tex"> x \in \mathbb{R^{n_x}} </script>, where <script type="math/tex"> n_x </script> is the number of features. In code, this would become an array of dimensions <script type="math/tex"> (n_x, 1) </script>.</li>
+<li><strong>Training labels</strong>: <em>One</em> training label is represtend by <script type="math/tex"> y \in {0, 1} </script>. For example, in our cat-or-not game, <script type="math/tex"> y = 1 </script> would mean that a cat is in the image and <script type="math/tex"> y = 0 </script> would indicate that it is not</li>
+</ul></li>
+<li>What it calculates:
+
+<ul>
+<li><strong>The weights and the threshold</strong>: <script type="math/tex"> w \in \mathbb{R^{n_x}} </script> and <script type="math/tex"> b \in \mathbb{R} </script>. So <script type="math/tex"> w </script> is an array of dimensions <script type="math/tex"> (n_x, 1) </script> (same as <script type="math/tex"> x </script>), while <script type="math/tex"> b </script> is just a real number</li>
+</ul></li>
+<li>What it predicts: <script type="math/tex"> \hat{y} = P( y = 1 | x)</script>, i.e. the probability that <script type="math/tex"> y </script> is 1 given <script type="math/tex"> x </script>.</li>
+</ul>
+
+<h3 id="generating-features-and-labels-for-the-cat-or-not-problem">Generating features and labels for the Cat-Or-Not problem</h3>
+
+<p>In the Cat-Or-Not problem, what we are given for training is a set of images, for each of which has been labelled as having a cat or not. We need to convert our image and our knowledge of whether it has a cat into actual values of <script type="math/tex"> x </script> and <script type="math/tex"> y </script>. This is how we accomplish this in code:</p>
+
+<ol>
+<li>We read in the image using one of python&rsquo;s packages (I recommend <code>ndimage</code>), and we get an array with size <script type="math/tex"> (r_x, r_y, 3) </script> where <script type="math/tex"> (r_x, r_y) </script> is the resolution of the image (the number of pixels along the two axes) and the 3 values for each pixel represent the RGB color values that the image needs to decide the colour at that pixel. Since <script type="math/tex"> x </script> is a 1-D vector, we convert this 3-D matrix into a 1-d vector, by simply concatenating all of the values into one long vector of dimension <script type="math/tex"> r_x \times r_y \times 3 </script>.</li>
+<li>The label <script type="math/tex"> y = 0 </script> if there isn&rsquo;t a cat and <script type="math/tex"> y = 1 </script> if there is a cat. This part is not that complicated.</li>
+</ol>
+
+<p>So now, for each of our images, we have a vector of dimenstion <script type="math/tex"> (r_x \times r_y \times 3, 1) </script>, and a value for <script type="math/tex"> y </script>.</p>
+
+<h3 id="logistic-regression-as-a-neuron">Logistic Regression as a Neuron</h3>
+
+<p>The problem statement of LR is:</p>
+
+<script type="math/tex; mode=display">
+\text{Given }x, \text{ get } \hat{y} = P( y = 1 | x )
+</script>
+
+<p>In plain words for our cat-or-not game: given an image represented by the feature vector <script type="math/tex"> x </script>, tell me the probability that there is a cat in it.</p>
+
+<p>We have multiple (many!) images for which we know the &ldquo;ground truth&rdquo;, i.e. whether the image contains a cat. So we want to train our algorithm so that we best understand from these images what it means for an image to have a cat. Is that sort of clear? The goal of logistic regression is to <strong>minimize the error</strong> between its predictions and the ground truth in the training data.</p>
+
+<p>We start by defining the prediction <script type="math/tex"> \hat{y} </script> as follows:</p>
+
+<script type="math/tex; mode=display">
+\hat{y} = \sigma (w^Tx +b)
+\text{    where } \sigma(z) = \displaystyle \frac{1}{1 + e^{-z}}
+</script>
+
+<p>&ldquo;What the hell is that? Where did the <script type="math/tex"> \sigma</script> come from? What is it?&ldquo;, one of you asks.</p>
+
+<p>The idea behind the <strong>sigmoid</strong> function is as follows: <script type="math/tex"> w^Tx + b </script> is a linear function of <script type="math/tex"> x </script>, so that&rsquo;s cool. But this linear function is unbounded, and since we want a probability we have to constrain it to the interval <script type="math/tex"> [0, +1] </script>. As you can see in the image below, the sigmoid is bounded between 0 and 1.</p>
+
+<p><img src="{{ site.url }}/assets/dl_week2/sigmoid.png" alt="The Sigmoid Function" />
+<em>The sigmoid function. Notice how it is 0 for large negative values of <script type="math/tex"> x </script>, 1 for large positive values, and 0.5 when <script type="math/tex"> x = 0 </script></em></p>
+
+<p>So we have a nice measure for probability. It also helps that the sigmoid function is continuous and smooth everywhere, but that&rsquo;s too much for this article.</p>
+
+<p>Can you see the similarity to Neural Networks now? We have a linear transformation and an activation function being applied to an input: exactly like a neuron! Want a figure? Here you go!</p>
+
+<p>{:refdef: style=&ldquo;text-align: center;&ldquo;}
+<img src="{{ site.url }}/assets/dl_week2/lr_nn.jpg" alt="Logistic Regression on One Training Example as a Neuron" />
+<em>Logistic Regression on a single training example as a Neuron</em>
+{: refdef}</p>
+
+<h2 id="conclusion-of-part-1">Conclusion of Part 1</h2>
+
+<p>The following facts are important to keep in mind:</p>
+
+<ol>
+<li>Everything so far has been for a <em>single</em> training example</li>
+<li>Our goal is to find <script type="math/tex"> \hat{y} </script>. To find <script type="math/tex"> \hat{y} </script>, we have to calculate <script type="math/tex"> w </script> and <script type="math/tex"> b </script>.</li>
+</ol>
+
+<p>We don&rsquo;t seem any closer to this than we started, I know. But this post was just to set up the problem and notation.</p>
+
+<p><mark>Very important thing</mark>: We are trying to minimize the error between our predictions and the ground truth. Put another way, we are trying to <em>extract as much relevant information</em> as possible from the training examples, so that the predictions that our Logistic Regression algorithm makes are sensible. I&rsquo;ve always found it very useful to think in terms of extracting information from the training examples, and this is a point I&rsquo;ll keep returning to as we go on with this tutorial series</p>
+
+<h2 id="to-be-continued">To be continued&hellip;</h2>
+
+<p>In the next part, we&rsquo;ll explore:</p>
+
+<ol>
+<li>How we connect all the training examples through an iterative process in order to EXTRACT ALL THE INFORMATION! As you can see, I&rsquo;m pretty excited about it</li>
+<li>How we define the deviation between our predictions and the ground truth (the error)</li>
+<li>How we minimize it</li>
+</ol>
+
+<p>It turns out none of this is easy, but all of it is supremely fascinating.</p>
+
+    </div>
+    <div class="info post_meta">
+      <time datetime=0001-01-01T00:00:00Z class="date">Monday, January 1, 0001</time>
+      
+      
+    </div>
+    <div class="clearfix"></div>
+  </article>
+	
+		<div class="other_posts">
+			
+			<a href="https://pritamps.github.io/post/2017-08-15-week-2-part-2-lr-gradient-descent-and-neural-networks/" class="prev"></a>
+			
+			
+			<a href="https://pritamps.github.io/post/2017-08-11-week-1-intro-to-nn/" class="next"></a>
+			
+		</div>
+		<aside id="comments">
+</aside>
+
+	
+</section>
+
+        <a id="back_to_top" title="Go To Top" href="#">
+  <span>
+    <svg viewBox="0 0 24 24">
+      <path fill="none" d="M0 0h24v24H0z"></path>
+      <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"></path>
+    </svg>
+  </span>
+</a>
+
+        <footer id="footer">
+  <p>
+    <span>&copy; 2020 <a href="https://pritamps.github.io" title="Programming Blog">Programming Blog</a> </span>
+    <span>Built with <a rel="nofollow" target="_blank" href="https:/gohugo.io">Hugo</a></span>
+    <span>Theme by <a rel="nofollow" target="_blank" href="https://github.com/wayjam/hugo-theme-mixedpaper">WayJam</a></span>
+  </p>
+
+  <script src="https://pritamps.github.io/js/main.min.eac174914a2c8d5b3cc7d2f766c41a23844a384c95187d52847b0b2e8c2b77a1.js" integrity="sha256-6sF0kUosjVs8x9L3ZsQaI4RKOEyVGH1ShHsLLowrd6E=" crossorigin="anonymous"></script>
+</footer>
+
+    </body>
+</html>
