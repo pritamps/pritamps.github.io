@@ -1,0 +1,5 @@
+baseURL: https://pritamps.github.io
+disablePathToLower: true
+languageCode: en-us
+title: Programming Blog
+theme: mixedpaper
